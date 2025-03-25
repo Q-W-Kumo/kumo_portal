@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+
+  <title>FF7ECギルド初期設定画面</title>
+
+  <!-- Google Fonts と アイコンライブラリ (Font Awesome) を追加 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+      margin: 0;
+      display: flex;
+    }
+
+    /* ===== サイドメニュー ===== */
+    .sidebar {
+      width: 240px;
+      background-color: #2c2c2c;
+      height: 100vh;
+      padding: 20px 15px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: fixed; /* 固定表示 */
+      left: 0;
+      top: 0;
+    }
+
+    .login-id-box {
+      border: 2px solid yellow;
+      background-color: #1a1a1a;
+      padding: 10px;
+      margin-bottom: 30px;
+      color: yellow;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      box-sizing: border-box;
+      border-radius: 5px;
+    }
+
+    .menu-header {
+      color: #fff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .menu-header i {
+      margin-right: 10px;
+    }
+
+    .menu-button {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      background-color: #2196F3;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      transition: background-color 0.3s;
+      text-decoration: none;
+    }
+
+    .menu-button i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .menu-button:hover {
+      background-color: #1976D2;
+    }
+
+    /* ===== メインコンテンツ ===== */
+    .main-content {
+      margin-left: 240px; /* サイドバーの幅と合わせる */
+      flex: 1;
+      padding: 0;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .tab {
+      background-color: #333;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px 5px 0 0;
+      margin: 0 5px;
+    }
+
+    .tab.active {
+      background-color: #4CAF50;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-container {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      width: 800px;
+      margin: 30px auto;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    input[type="text"], input[type="number"], input[type="date"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: none;
+      box-sizing: border-box;
+    }
+
+    .checkbox-container {
+      border: 1px solid #888;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+
+    .type-container {
+      border: 1px solid #888;
+      border-radius: 5px;
+      padding: 10px;
+      width: 100px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    fieldset {
+      border: 1px solid #888;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    legend {
+      text-align: left;
+      padding: 0 5px;
+      font-size: 14px;
+    }
+
+    .flex-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    table {
+      width: 95%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    th {
+      background-color: #333;
+    }
+
+    .action-btn {
+      background-color: #2196F3;
+      border: none;
+      padding: 5px 10px;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 2px;
+    }
+
+    .role-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      color: #fff;
+      font-size: 10px;
+      border-radius: 3px;
+    }
+
+    .role-gm { background-color: yellow; color: #000; }
+    .role-sm { background-color: #2196F3; }
+    .role-general { background-color: #4CAF50; }
+    .role-dfn { background-color: gray; }
+
+    .status-ongoing { color: yellow; }
+    .status-finished { color: gray; }
+
+    .dfn-row td { color: gray; }
+  </style>
+</head>
+<body>
+
+<!-- ===== サイドバー ===== -->
+<div class="sidebar">
+  <div class="login-id-box" id="loginIdBox">ログインID: 取得中...</div>
+
+  <div class="menu-header"><i class="fas fa-bars"></i>メニュー</div>
+
+  <button class="menu-button" onclick="navigatePage('guild_home.html')">
+    <i class="fas fa-house"></i> ホーム
+  </button>
+  <button class="menu-button" onclick="navigatePage('guild_battle_input.html')">
+    <i class="fas fa-pen-to-square"></i> データ入力
+  </button>
+  <button class="menu-button" onclick="navigatePage('guild_battle_view.html')">
+    <i class="fas fa-chart-bar"></i> データビュー
+  </button>
+</div>
+
+<!-- ===== メインコンテンツ ===== -->
+<div class="main-content">
+
+  <h2>FF7ECギルド初期設定画面</h2>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('memberTab')">ギルドメンバー管理</div>
+    <div class="tab" onclick="switchTab('guildBattleTab')">ギルドバトル詳細</div>
+  </div>
+
+  <!-- ===== メンバー管理（あなたの完成形をそのまま保持） ===== -->
+<div id="memberTab" class="tab-content active">
+  <div class="form-container">
+    <div class="flex-row">
+      <div style="flex:1;">
+        <label>ID</label>
+        <input type="text" id="memberId">
+      </div>
+      <div style="flex:1;">
+        <label>団員名</label>
+        <input type="text" id="memberName">
+      </div>
+      <div style="flex:1;">
+        <label>役割</label>
+        <select id="memberRole" onchange="limitRoles(this)">
+          <option value="一般" selected>一般</option>
+          <option value="SM">サブマスター</option>
+          <option value="GM">ギルドマスター</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex-row">
+      <div style="flex:1;">
+        <label>プレイヤーレベル</label>
+        <input type="number" id="memberLevel">
+      </div>
+      <div style="flex:1;">
+        <label>最高戦力値</label>
+        <input type="number" id="memberPower">
+      </div>
+      <div style="flex:1;">
+        <label>加入日</label>
+        <input type="date" id="memberJoinDate">
+      </div>
+    </div>
+
+    <div>
+      <label>備考</label>
+      <input type="text" id="memberNote">
+    </div>
+
+    <button onclick="addMember()">メンバー登録</button>
+    <button onclick="clearMemberForm()">クリア</button>
+  </div>
+
+  <h3>登録済みメンバー一覧</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>役割</th>
+        <th>団員名</th>
+        <th>レベル</th>
+        <th>戦力</th>
+        <th>加入日</th>
+        <th>備考</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="memberTableBody"></tbody>
+  </table>
+</div>
+
+  <!-- ===== ギルドバトル詳細（あなたの完成形をそのまま保持） ===== -->
+<div id="guildBattleTab" class="tab-content">
+  <div class="form-container">
+
+    <label>開催回</label>
+    <select id="battleRound">
+      <option value="">選択してください</option>
+      <script>for (let i = 1; i <= 50; i++) document.write(`<option value="第${i}回">第${i}回</option>`);</script>
+    </select>
+
+    <label>対象エネミー</label>
+    <input type="text" id="enemyTarget">
+
+    <div class="flex-row">
+      <div style="flex:2;">
+        <label>対象属性</label>
+        <div class="checkbox-container">
+          <div class="checkbox-group">
+            <label><input type="checkbox" value="火" class="element-checkbox"> 火</label>
+            <label><input type="checkbox" value="冷" class="element-checkbox"> 冷</label>
+            <label><input type="checkbox" value="雷" class="element-checkbox"> 雷</label>
+            <label><input type="checkbox" value="風" class="element-checkbox"> 風</label>
+            <label><input type="checkbox" value="土" class="element-checkbox"> 土</label>
+            <label><input type="checkbox" value="水" class="element-checkbox"> 水</label>
+            <label><input type="checkbox" value="無" class="element-checkbox"> 無</label>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1;">
+        <label>対象種別</label>
+        <div class="type-container">
+          <label><input type="checkbox" value="物理" class="type-checkbox"> 物理</label>
+          <label><input type="checkbox" value="魔法" class="type-checkbox"> 魔法</label>
+        </div>
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>模擬戦期間</legend>
+      <div class="flex-row">
+        <label>開始日</label>
+        <input type="date" id="practiceStartDate">
+        <label>終了日</label>
+        <input type="date" id="practiceEndDate">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>本戦期間</legend>
+      <div class="flex-row">
+        <label>1日目</label>
+        <input type="date" id="mainBattleDay1">
+        <label>2日目</label>
+        <input type="date" id="mainBattleDay2">
+        <label>最終日</label>
+        <input type="date" id="mainBattleDay3">
+      </div>
+    </fieldset>
+
+    <label>背景画像URL</label>
+    <input type="text" id="bgImageUrl">
+
+    <button onclick="saveGuildSettings()">設定を保存</button>
+    <button onclick="updateStatus('ongoing')">開催中</button>
+    <button onclick="updateStatus('finished')">終了</button>
+  </div>
+
+  <h3>ギルドバトル詳細設定一覧</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>開催回</th>
+        <th>対象エネミー</th>
+        <th>属性</th>
+        <th>種別</th>
+        <th>模擬戦</th>
+        <th>本戦1日目</th>
+        <th>本戦2日目</th>
+        <th>本戦最終日</th>
+        <th>背景画像</th>
+        <th>状態</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="battleSettingsTableBody"></tbody>
+  </table>
+</div>
+
+</div>
+
+<script>
+  // ===== ログインID取得・表示 =====
+  const urlParams = new URLSearchParams(window.location.search);
+  const loginId = urlParams.get('loginId') || '未取得';
+  document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
+
+  // ===== ページ遷移関数（loginId付き） =====
+  function navigatePage(page) {
+    window.location.href = `${page}?loginId=${loginId}`;
+  }
+
+  // ===== 既存スクリプト（switchTab～window.onload）をそのまま保持・記述 =====
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+}
+
+function goHome() {
+  window.location.href = 'guild_home.html';
+}
+
+function limitRoles(select) {
+  const role = select.value;
+  const members = JSON.parse(localStorage.getItem('guildMembers')) || [];
+  const gmCount = members.filter(m => m.role === 'GM').length;
+  const smCount = members.filter(m => m.role === 'SM').length;
+
+  if (role === 'GM' && gmCount >= 1) {
+    alert('ギルドマスターは1名のみ設定可能です');
+    select.value = '一般';
+  }
+  if (role === 'SM' && smCount >= 4) {
+    alert('サブマスターは4名まで設定可能です');
+    select.value = '一般';
+  }
+}
+
+
+function addMember() {
+  const id = document.getElementById('memberId').value;
+  const name = document.getElementById('memberName').value;
+  const role = document.getElementById('memberRole').value;
+  const level = document.getElementById('memberLevel').value;
+  const power = document.getElementById('memberPower').value;
+  const joinDate = document.getElementById('memberJoinDate').value;
+  const note = document.getElementById('memberNote').value;
+
+  if (!id || !name) {
+    alert('IDと団員名は必須です');
+    return;
+  }
+
+async function addMember() {
+  const id = document.getElementById('memberId').value;
+  const name = document.getElementById('memberName').value;
+  const role = document.getElementById('memberRole').value;
+  const level = Number(document.getElementById('memberLevel').value);
+  const power = Number(document.getElementById('memberPower').value);
+  const joinDate = document.getElementById('memberJoinDate').value;
+  const note = document.getElementById('memberNote').value;
+
+  if (!id || !name) {
+    alert('IDと団員名は必須です');
+    return;
+  }
+
+  const { data: existing, error: fetchError } = await supabase
+    .from('guild_members')
+    .select('id')
+    .eq('id', id)
+    .maybeSingle();
+
+  const memberData = { id, name, role, level, power, join_date: joinDate, note };
+
+  let result;
+  if (existing) {
+    result = await supabase
+      .from('guild_members')
+      .update(memberData)
+      .eq('id', id);
+  } else {
+    result = await supabase
+      .from('guild_members')
+      .insert(memberData);
+  }
+
+  if (result.error) {
+    alert('登録に失敗しました: ' + result.error.message);
+    return;
+  }
+
+  alert('メンバーを登録しました');
+  clearMemberForm();
+  renderMembers();
+}
+
+function clearMemberForm() {
+  document.getElementById('memberId').value = '';
+  document.getElementById('memberName').value = '';
+  document.getElementById('memberRole').value = '一般';
+  document.getElementById('memberLevel').value = '';
+  document.getElementById('memberPower').value = '';
+  document.getElementById('memberJoinDate').value = '';
+  document.getElementById('memberNote').value = '';
+}
+
+function renderMembers() {
+
+async function renderMembers() {
+  const { data: members, error } = await supabase
+    .from('guild_members')
+    .select('*');
+
+  if (error) {
+    alert('メンバーの取得に失敗しました: ' + error.message);
+    return;
+  }
+
+  members.sort((a, b) => {
+    const roleOrder = { 'GM': 1, 'SM': 2, '一般': 3, 'DFN': 4 };
+    if (roleOrder[a.role] !== roleOrder[b.role]) {
+      return roleOrder[a.role] - roleOrder[b.role];
+    }
+    return b.power - a.power;
+  });
+
+  const tbody = document.getElementById('memberTableBody');
+  tbody.innerHTML = '';
+
+  members.forEach(member => {
+    const tr = document.createElement('tr');
+    if (member.role === 'DFN') tr.classList.add('dfn-row');
+
+    const roleIconClass = member.role === 'GM' ? 'role-gm' :
+                          member.role === 'SM' ? 'role-sm' :
+                          member.role === 'DFN' ? 'role-dfn' : 'role-general';
+
+    tr.innerHTML = `
+      <td>${member.id}</td>
+      <td><span class="role-icon ${roleIconClass}">${member.role}</span></td>
+      <td>${member.name}</td>
+      <td>${member.level}</td>
+      <td>${member.power}</td>
+      <td>${member.join_date || ''}</td>
+      <td>${member.note || ''}</td>
+      <td>
+        <button class="action-btn" onclick="editMember('${member.id}')">編集</button>
+        ${member.role !== 'DFN' ? `<button class="action-btn" onclick="withdrawMember('${member.id}')">脱退</button>` : ''}
+        ${member.role === 'DFN' ? `<button class="action-btn" onclick="deleteMember('${member.id}')">削除</button>` : ''}
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+  members.sort((a, b) => {
+    const roleOrder = { 'GM': 1, 'SM': 2, '一般': 3, 'DFN': 4 };
+    if (roleOrder[a.role] !== roleOrder[b.role]) {
+      return roleOrder[a.role] - roleOrder[b.role];
+    }
+    return b.power - a.power;
+  });
+
+  const tbody = document.getElementById('memberTableBody');
+  tbody.innerHTML = '';
+
+  members.forEach(member => {
+    const tr = document.createElement('tr');
+    if (member.role === 'DFN') tr.classList.add('dfn-row');
+
+    const roleIconClass = member.role === 'GM' ? 'role-gm' :
+                          member.role === 'SM' ? 'role-sm' :
+                          member.role === 'DFN' ? 'role-dfn' : 'role-general';
+
+    tr.innerHTML = `
+      <td>${member.id}</td>
+      <td><span class="role-icon ${roleIconClass}">${member.role}</span></td>
+      <td>${member.name}</td>
+      <td>${member.level}</td>
+      <td>${member.power}</td>
+      <td>${member.joinDate}</td>
+      <td>${member.note}</td>
+      <td>
+        <button class="action-btn" onclick="editMember('${member.id}')">編集</button>
+        ${member.role !== 'DFN' ? `<button class="action-btn" onclick="withdrawMember('${member.id}')">脱退</button>` : ''}
+        ${member.role === 'DFN' ? `<button class="action-btn" onclick="deleteMember('${member.id}')">削除</button>` : ''}
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function editMember(id) {
+  const { data: member, error } = await supabase
+    .from('guild_members')
+    .select()
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error || !member) {
+    alert('データ取得に失敗しました');
+    return;
+  }
+
+  document.getElementById('memberId').value = member.id;
+  document.getElementById('memberName').value = member.name;
+  document.getElementById('memberRole').value = member.role;
+  document.getElementById('memberLevel').value = member.level;
+  document.getElementById('memberPower').value = member.power;
+  document.getElementById('memberJoinDate').value = member.join_date || '';
+  document.getElementById('memberNote').value = member.note;
+}
+
+async function withdrawMember(id) {
+  if (!confirm('このメンバーを脱退させますか？')) return;
+  await supabase.from('guild_members').update({ role: 'DFN' }).eq('id', id);
+  renderMembers();
+}
+
+async function addMember() {
+  const id = document.getElementById('memberId').value;
+  const name = document.getElementById('memberName').value;
+  const role = document.getElementById('memberRole').value;
+  const level = Number(document.getElementById('memberLevel').value);
+  const power = Number(document.getElementById('memberPower').value);
+  const joinDate = document.getElementById('memberJoinDate').value;
+  const note = document.getElementById('memberNote').value;
+
+  if (!id || !name) {
+    alert('IDと団員名は必須です');
+    return;
+  }
+
+  const { data: existing, error: fetchError } = await supabase
+    .from('guild_members')
+    .select()
+    .eq('id', id)
+    .maybeSingle();
+
+  let result;
+  if (existing) {
+    result = await supabase
+      .from('guild_members')
+      .update({ name, role, level, power, join_date: joinDate, note })
+      .eq('id', id);
+  } else {
+    result = await supabase
+      .from('guild_members')
+      .insert([{ id, name, role, level, power, join_date: joinDate, note }]);
+  }
+
+  if (result.error) {
+    alert('登録エラー: ' + result.error.message);
+  } else {
+    alert('メンバーを登録しました');
+    clearMemberForm();
+    renderMembers();
+  }
+}
+
+async function deleteMember(id) {
+  if (!confirm('このメンバーを完全に削除しますか？')) return;
+  await supabase.from('guild_members').delete().eq('id', id);
+  renderMembers();
+}
+
+async function renderMembers() {
+  const { data: members, error } = await supabase
+    .from('guild_members')
+    .select();
+
+  if (error) {
+    alert('メンバーの取得に失敗しました: ' + error.message);
+    return;
+  }
+
+  members.sort((a, b) => {
+    const roleOrder = { 'GM': 1, 'SM': 2, '一般': 3, 'DFN': 4 };
+    if (roleOrder[a.role] !== roleOrder[b.role]) {
+      return roleOrder[a.role] - roleOrder[b.role];
+    }
+    return b.power - a.power;
+  });
+
+  const tbody = document.getElementById('memberTableBody');
+  tbody.innerHTML = '';
+
+  members.forEach(member => {
+    const tr = document.createElement('tr');
+    if (member.role === 'DFN') tr.classList.add('dfn-row');
+
+    const roleIconClass = member.role === 'GM' ? 'role-gm' :
+                          member.role === 'SM' ? 'role-sm' :
+                          member.role === 'DFN' ? 'role-dfn' : 'role-general';
+
+    tr.innerHTML = `
+      <td>${member.id}</td>
+      <td><span class="role-icon ${roleIconClass}">${member.role}</span></td>
+      <td>${member.name}</td>
+      <td>${member.level}</td>
+      <td>${member.power}</td>
+      <td>${member.join_date || ''}</td>
+      <td>${member.note}</td>
+      <td>
+        <button class="action-btn" onclick="editMember('${member.id}')">編集</button>
+        ${member.role !== 'DFN' ? `<button class="action-btn" onclick="withdrawMember('${member.id}')">脱退</button>` : ''}
+        ${member.role === 'DFN' ? `<button class="action-btn" onclick="deleteMember('${member.id}')">削除</button>` : ''}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+  members = members.filter(m => m.id !== id);
+  localStorage.setItem('guildMembers', JSON.stringify(members));
+  renderMembers();
+}
+
+async function saveGuildSettings() {
+  const round = document.getElementById('battleRound').value;
+  if (!round) {
+    alert('開催回を選択してください');
+    return;
+  }
+
+  const enemyTarget = document.getElementById('enemyTarget').value;
+  const attributes = Array.from(document.querySelectorAll('.element-checkbox:checked')).map(cb => cb.value);
+  const types = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(cb => cb.value);
+  const practiceStartDate = document.getElementById('practiceStartDate').value;
+  const practiceEndDate = document.getElementById('practiceEndDate').value;
+  const mainBattleDay1 = document.getElementById('mainBattleDay1').value;
+  const mainBattleDay2 = document.getElementById('mainBattleDay2').value;
+  const mainBattleDay3 = document.getElementById('mainBattleDay3').value;
+  const bgImageUrl = document.getElementById('bgImageUrl').value;
+
+  // 既存データがあるか確認
+  const { data: existing, error: fetchError } = await supabase
+    .from('guild_battle_settings')
+    .select()
+    .eq('round', round)
+    .maybeSingle();
+
+  const settingData = {
+    round,
+    enemy_target: enemyTarget,
+    attributes,
+    type: types,
+    practice_start: practiceStartDate,
+    practice_end: practiceEndDate,
+    main1: mainBattleDay1,
+    main2: mainBattleDay2,
+    main3: mainBattleDay3,
+    bg_image: bgImageUrl,
+    status: existing?.status || 'finished'
+  };
+
+  let result;
+  if (existing) {
+    result = await supabase
+      .from('guild_battle_settings')
+      .update(settingData)
+      .eq('round', round);
+  } else {
+    result = await supabase
+      .from('guild_battle_settings')
+      .insert([settingData]);
+  }
+
+  if (result.error) {
+    alert('保存に失敗しました: ' + result.error.message);
+    return;
+  }
+
+  alert('設定を保存しました');
+  renderBattleSettings(); // 表示も更新
+}
+
+async function renderBattleSettings() {
+  const { data: settings, error } = await supabase
+    .from('guild_battle_settings')
+    .select('*');
+
+  if (error) {
+    alert('設定の取得に失敗しました: ' + error.message);
+    return;
+  }
+
+  const tbody = document.getElementById('battleSettingsTableBody');
+  tbody.innerHTML = '';
+
+  settings.forEach(setting => {
+    const statusClass = setting.status === 'ongoing' ? 'status-ongoing' : 'status-finished';
+
+    const bgImgHtml = setting.bg_image
+      ? `<img src="${setting.bg_image}" width="50" height="50" style="object-fit: cover;">`
+      : '未設定';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${setting.round}</td>
+      <td>${setting.enemy_target}</td>
+      <td>${(setting.attributes || []).join(',')}</td>
+      <td>${(setting.type || []).join(',')}</td>
+      <td>${setting.practice_start || ''}〜${setting.practice_end || ''}</td>
+      <td>${setting.main1 || ''}</td>
+      <td>${setting.main2 || ''}</td>
+      <td>${setting.main3 || ''}</td>
+      <td>${bgImgHtml}</td>
+      <td class="${statusClass}">${setting.status === 'ongoing' ? '開催中' : '終了'}</td>
+      <td>
+        <button class="action-btn" onclick="editSetting('${setting.round}')">編集</button>
+        <button class="action-btn" onclick="deleteSetting('${setting.round}')">削除</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function deleteSetting(round) {
+  if (!confirm('この設定を削除しますか？')) return;
+
+  const { error } = await supabase
+    .from('guild_battle_settings')
+    .delete()
+    .eq('round', round);
+
+  if (error) {
+    alert('削除に失敗しました: ' + error.message);
+    return;
+  }
+
+  alert('削除しました');
+  renderBattleSettings();
+}
+  // ✅ 新規追加（編集ボタン処理）
+async function editSetting(round) {
+  const { data: setting, error } = await supabase
+    .from('guild_battle_settings')
+    .select('*')
+    .eq('round', round)
+    .maybeSingle();
+
+  if (error || !setting) {
+    alert('データ取得に失敗しました');
+    return;
+  }
+
+  document.getElementById('battleRound').value = setting.round;
+  document.getElementById('enemyTarget').value = setting.enemy_target;
+  document.getElementById('practiceStartDate').value = setting.practice_start || '';
+  document.getElementById('practiceEndDate').value = setting.practice_end || '';
+  document.getElementById('mainBattleDay1').value = setting.main1 || '';
+  document.getElementById('mainBattleDay2').value = setting.main2 || '';
+  document.getElementById('mainBattleDay3').value = setting.main3 || '';
+  document.getElementById('bgImageUrl').value = setting.bg_image || '';
+
+  document.querySelectorAll('.element-checkbox').forEach(cb => {
+    cb.checked = (setting.attributes || []).includes(cb.value);
+  });
+
+  document.querySelectorAll('.type-checkbox').forEach(cb => {
+    cb.checked = (setting.type || []).includes(cb.value);
+  });
+
+  alert(`「${setting.round}」のデータを編集モードで読み込みました`);
+}
+
+async function updateStatus(status) {
+  const round = document.getElementById('battleRound').value;
+  if (!round) {
+    alert('開催回を選択してください');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('guild_battle_settings')
+    .update({ status })
+    .eq('round', round);
+
+  if (error) {
+    alert('ステータス更新に失敗しました: ' + error.message);
+    return;
+  }
+
+  alert(`ステータスを「${status === 'ongoing' ? '開催中' : '終了'}」に変更しました`);
+  renderBattleSettings();
+}
+
+window.onload = async () => {
+  await renderMembers();
+  renderBattleSettings(); // battleSettings は別途対応時に変更
+};
+
+</script>
+</body>
+</html>
