@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase 接続テスト</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function testInsert() {
+      const id = document.getElementById('testId').value;
+      const name = document.getElementById('testName').value;
+
+      const { data, error } = await supabase.from('guild_members').insert([
+        { id, name }
+      ]);
+
+      if (error) {
+        alert("登録失敗: " + error.message);
+      } else {
+        alert("登録成功！ID: " + id + ", 名前: " + name);
+      }
+    }
+  </script>
+</head>
+<body style="background:#111; color:#fff; font-family:sans-serif; padding:20px">
+  <h2>Supabase データ格納テスト</h2>
+  <label>ID:</label><br>
+  <input type="text" id="testId" placeholder="例: test001"><br><br>
+
+  <label>名前:</label><br>
+  <input type="text" id="testName" placeholder="例: クラウド"><br><br>
+
+  <button onclick="testInsert()">データ登録</button>
+</body>
+</html>
