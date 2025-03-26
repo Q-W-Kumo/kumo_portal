@@ -482,49 +482,6 @@ function limitRoles(select) {
   }
 }
 
-async function addMember() {
-  const id = document.getElementById('memberId').value;
-  const name = document.getElementById('memberName').value;
-  const role = document.getElementById('memberRole').value;
-  const level = Number(document.getElementById('memberLevel').value);
-  const power = Number(document.getElementById('memberPower').value);
-  const joinDate = document.getElementById('memberJoinDate').value;
-  const note = document.getElementById('memberNote').value;
-
-  if (!id || !name) {
-    alert('IDと団員名は必須です');
-    return;
-  }
-
-  const { data: existing, error: fetchError } = await supabase
-    .from('guild_members')
-    .select('id')
-    .eq('id', id)
-    .maybeSingle();
-
-  const memberData = { id, name, role, level, power, join_date: joinDate, note };
-
-  let result;
-  if (existing) {
-    result = await supabase
-      .from('guild_members')
-      .update(memberData)
-      .eq('id', id);
-  } else {
-    result = await supabase
-      .from('guild_members')
-      .insert(memberData);
-  }
-
-  if (result.error) {
-    alert('登録に失敗しました: ' + result.error.message);
-    return;
-  }
-
-  alert('メンバーを登録しました');
-  clearMemberForm();
-  renderMembers();
-}
 
 function clearMemberForm() {
   document.getElementById('memberId').value = '';
