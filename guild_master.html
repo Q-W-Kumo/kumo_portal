@@ -407,49 +407,49 @@
     document.getElementById('memberNote').value = '';
   }
 
-  async function addMember() {
-    const id = document.getElementById('memberId').value;
-    const name = document.getElementById('memberName').value;
-    const role = document.getElementById('memberRole').value;
-    const level = parseInt(document.getElementById('memberLevel').value);
-    const power = parseInt(document.getElementById('memberPower').value);
-    const joined_at = document.getElementById('memberJoinDate').value;
-    const note = document.getElementById('memberNote').value;
+async function addMember() {
+  const id = document.getElementById('memberId').value;
+  const name = document.getElementById('memberName').value;
+  const role = document.getElementById('memberRole').value;
+  const level = parseInt(document.getElementById('memberLevel').value);
+  const power = parseInt(document.getElementById('memberPower').value);
+  const joined_at = document.getElementById('memberJoinDate').value;
+  const note = document.getElementById('memberNote').value;
 
-    if (!id || !name) {
-      alert('IDと団員名は必須です');
-      return;
-    }
-
-    const { data: existing, error: fetchError } = await supabase
-      .from('guild_members')
-      .select('id')
-      .eq('id', id)
-      .maybeSingle();
-
-    const memberData = { id, name, role, level, power, joined_at, note };
-
-    let result;
-    if (existing) {
-      result = await supabase
-        .from('guild_members')
-        .update(memberData)
-        .eq('id', id);
-    } else {
-      result = await supabase
-        .from('guild_members')
-        .insert([memberData]);
-    }
-
-    if (result.error) {
-      alert('登録に失敗しました: ' + result.error.message);
-    } else {
-      alert('✅ メンバーを登録しました');
-      clearMemberForm();
-      renderMembers();
-    }
+  if (!id || !name) {
+    alert('IDと団員名は必須です');
+    return;
   }
 
+  // 既存確認
+  const { data: existing, error: fetchError } = await db
+    .from('guild_members')
+    .select('id')
+    .eq('id', id)
+    .maybeSingle();
+
+  let result;
+  const memberData = { id, name, role, level, power, joined_at, note };
+
+  if (existing) {
+    result = await db
+      .from('guild_members')
+      .update(memberData)
+      .eq('id', id);
+  } else {
+    result = await db
+      .from('guild_members')
+      .insert([memberData]);
+  }
+
+  if (result.error) {
+    alert('登録に失敗しました: ' + result.error.message);
+  } else {
+    alert('✅ メンバー登録が完了しました');
+    clearMemberForm();
+    renderMembers(); // ← メンバー一覧を更新
+  }
+}
   async function renderMembers() {
     const { data: members, error } = await supabase
       .from('guild_members')
