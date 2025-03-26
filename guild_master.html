@@ -416,6 +416,19 @@ async function addMember() {
   const joined_at = document.getElementById('memberJoinDate').value;
   const note = document.getElementById('memberNote').value;
 
+    // ✅ role のバリデーション（ここがチェック！）
+  if (!['GM', 'SM', '一般'].includes(role)) {
+    alert("❌ 役割が不正です: " + role);
+    return;
+  }
+
+  // ✅ デバッグ用ログ（コンソールで中身が見える）
+  console.log("登録データ:", { id, name, role, level, power, joined_at, note });
+
+  const { data, error } = await supabase.from("guild_members").insert([
+    { id, name, role, level, power, joined_at, note }
+  ]);
+
   if (!id || !name) {
     alert('IDと団員名は必須です');
     return;
