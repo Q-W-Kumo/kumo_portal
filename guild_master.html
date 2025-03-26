@@ -482,21 +482,6 @@ function limitRoles(select) {
   }
 }
 
-
-function addMember() {
-  const id = document.getElementById('memberId').value;
-  const name = document.getElementById('memberName').value;
-  const role = document.getElementById('memberRole').value;
-  const level = document.getElementById('memberLevel').value;
-  const power = document.getElementById('memberPower').value;
-  const joinDate = document.getElementById('memberJoinDate').value;
-  const note = document.getElementById('memberNote').value;
-
-  if (!id || !name) {
-    alert('IDと団員名は必須です');
-    return;
-  }
-
 async function addMember() {
   const id = document.getElementById('memberId').value;
   const name = document.getElementById('memberName').value;
