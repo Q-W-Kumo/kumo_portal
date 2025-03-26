@@ -68,7 +68,7 @@
     const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function registerTestMember() {
       const id = document.getElementById("id").value;
@@ -79,7 +79,7 @@
       const joined_at = document.getElementById("joined_at").value;
       const note = document.getElementById("note").value;
 
-      const { data, error } = await supabase.from("guild_members").insert([
+      const { data, error } = await client.from("guild_members").insert([
         { id, name, level, power, role, joined_at, note }
       ]);
 
