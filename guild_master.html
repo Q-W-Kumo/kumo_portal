@@ -229,12 +229,12 @@
             <input type="text" id="memberName">
           </div>
           <div style="flex:1;">
-            <label>役割</label>
-            <select id="memberRole">
-              <option value="一般" selected>一般</option>
-              <option value="SM">サブマスター</option>
-              <option value="GM">ギルドマスター</option>
-            </select>
+<label>役割</label>
+<select id="memberRole" onchange="limitRoles(this)">
+  <option value="一般" selected>一般</option>
+  <option value="SM">サブマスター</option>
+  <option value="GM">ギルドマスター</option>
+</select>
           </div>
         </div>
 
