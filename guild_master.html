@@ -425,7 +425,7 @@ async function addMember() {
   // ✅ デバッグ用ログ（コンソールで中身が見える）
   console.log("登録データ:", { id, name, role, level, power, joined_at, note });
 
-  const { data, error } = await supabase.from("guild_members").insert([
+  const { data, error } = await db.from("guild_members").insert([
     { id, name, role, level, power, joined_at, note }
   ]);
 
@@ -464,7 +464,7 @@ async function addMember() {
   }
 }
   async function renderMembers() {
-    const { data: members, error } = await supabase
+    const { data: members, error } = await db
       .from('guild_members')
       .select('*');
 
@@ -513,7 +513,7 @@ async function addMember() {
 
 <script>
   async function editMember(id) {
-    const { data: member, error } = await supabase
+    const { data: member, error } = await db
       .from('guild_members')
       .select('*')
       .eq('id', id)
@@ -535,7 +535,7 @@ async function addMember() {
 
   async function withdrawMember(id) {
     if (!confirm('このメンバーを脱退させますか？')) return;
-    const { error } = await supabase
+    const { error } = await db
       .from('guild_members')
       .update({ role: 'DFN' })
       .eq('id', id);
@@ -551,7 +551,7 @@ async function addMember() {
   async function deleteMember(id) {
     if (!confirm('このメンバーを完全に削除しますか？')) return;
 
-    const { error } = await supabase
+    const { error } = await db
       .from('guild_members')
       .delete()
       .eq('id', id);
