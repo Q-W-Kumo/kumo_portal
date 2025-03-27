@@ -8,6 +8,13 @@
   <!-- Google Fonts と アイコンライブラリ (Font Awesome) を追加 -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+　<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+
+  <script>
+  const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I"; // ← あなたのAnon Keyを入れる
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
 
   <style>
     body {
@@ -515,9 +522,18 @@ function clearMemberForm() {
   document.getElementById('memberNote').value = '';
 }
 
-function renderMembers() {
-  let members = JSON.parse(localStorage.getItem('guildMembers')) || [];
+async function renderMembers() {
+  // ✅ Supabase からデータを取得
+  const { data: members, error } = await db
+    .from('guild_members') // ← Supabaseのテーブル名
+    .select('*'); // ← すべてのカラムを取得
 
+  if (error) {
+    alert('メンバー取得に失敗しました: ' + error.message);
+    return;
+  }
+
+  // ✅ ソート処理（役割 → 戦力順）
   members.sort((a, b) => {
     const roleOrder = { 'GM': 1, 'SM': 2, '一般': 3, 'DFN': 4 };
     if (roleOrder[a.role] !== roleOrder[b.role]) {
@@ -526,6 +542,7 @@ function renderMembers() {
     return b.power - a.power;
   });
 
+  // ✅ 画面に反映
   const tbody = document.getElementById('memberTableBody');
   tbody.innerHTML = '';
 
@@ -543,20 +560,19 @@ function renderMembers() {
       <td>${member.name}</td>
       <td>${member.level}</td>
       <td>${member.power}</td>
-      <td>${member.joinDate}</td>
-      <td>${member.note}</td>
+      <td>${member.joined_at || ''}</td>
+      <td>${member.note || ''}</td>
       <td>
         <button class="action-btn" onclick="editMember('${member.id}')">編集</button>
         ${member.role !== 'DFN' ? `<button class="action-btn" onclick="withdrawMember('${member.id}')">脱退</button>` : ''}
         ${member.role === 'DFN' ? `<button class="action-btn" onclick="deleteMember('${member.id}')">削除</button>` : ''}
       </td>
     `;
-
     tbody.appendChild(tr);
   });
 }
 
-function editMember(id) {
+  function editMember(id) {
   const members = JSON.parse(localStorage.getItem('guildMembers')) || [];
   const member = members.find(m => m.id === id);
   if (!member) return;
