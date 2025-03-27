@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>幻影旅団－蜘蛛－</title>
+
+  <!-- フォントとアイコン -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      background-color: #000;
+      color: #fff;
+    }
+
+    #background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://i.imgur.com/vWms7U9.jpeg') center center / cover no-repeat;
+      opacity: 0;
+      transition: opacity 5s ease-in-out;
+      z-index: 1;
+    }
+
+    #noise {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif') center center / cover no-repeat;
+      opacity: 0.8;
+      z-index: 2;
+      pointer-events: none;
+      animation: noiseFadeOut 8s forwards;
+    }
+
+    @keyframes noiseFadeOut {
+      0% { opacity: 0.8; }
+      50% { opacity: 0.4; }
+      100% { opacity: 0; }
+    }
+
+    #logo {
+      position: fixed;
+      bottom: -100px;
+      right: 20px;
+      width: 480px;
+      opacity: 0;
+      z-index: 4;
+      transition: all 3s ease;
+    }
+
+    #spider-line {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 0;
+      background-color: #000;
+      z-index: 4;
+      animation: lineDrop 4s forwards;
+    }
+
+    #spider {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      background: url('https://i.imgur.com/SKub7ko.png') center center / contain no-repeat;
+      z-index: 5;
+      animation: spiderDrop 4s forwards;
+    }
+
+    @keyframes lineDrop {
+      0% { height: 0; }
+      50% { height: 300px; }
+      100% { height: 300px; }
+    }
+
+    @keyframes spiderDrop {
+      0% { top: -200px; opacity: 0; }
+      10% { opacity: 1; }
+      50% { top: 300px; }
+      100% { top: 300px; }
+    }
+
+    @keyframes lineUp {
+      0% { height: 300px; }
+      100% { height: 0; }
+    }
+
+    @keyframes spiderUp {
+      0% { top: 300px; opacity: 1; }
+      100% { top: -200px; opacity: 0; }
+    }
+
+    #title-container {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 4;
+      opacity: 0;
+      transition: all 3s ease;
+    }
+
+    .main-title {
+      font-size: 48px;
+      color: #FFA500;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .main-title .kanji {
+      font-size: 80px;
+      color: #FF3333;
+    }
+
+    .sub-title {
+      margin-top: 10px;
+      font-size: 24px;
+      color: #FFCC00;
+      letter-spacing: 1px;
+    }
+
+    #loginForm {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 40px;
+      border-radius: 10px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 2s;
+      z-index: 4;
+      width: 400px;
+    }
+
+    #loginForm input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      border: none;
+      box-sizing: border-box;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      background-color: #2196F3;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      box-sizing: border-box;
+    }
+
+    .login-button i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .login-button:hover {
+      background-color: #1976D2;
+    }
+
+    .master-button {
+      background-color: #4CAF50;
+    }
+
+    .master-button:hover {
+      background-color: #388E3C;
+    }
+
+    .logout-button {
+      background-color: #f44336;
+    }
+
+    .logout-button:hover {
+      background-color: #d32f2f;
+    }
+
+    .auto-login {
+      margin-bottom: 10px;
+      color: #ccc;
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .auto-login input {
+      margin-right: 5px;
+    }
+
+    .greeting {
+      color: #FFD700;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .quote {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.7);
+      text-shadow: 0 0 10px #000;
+      opacity: 0;
+      white-space: pre-wrap;
+      z-index: 2;
+      transition: opacity 2s;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="background"></div>
+  <div id="noise"></div>
+
+  <img id="logo" src="https://i.imgur.com/TNX49ES.png" alt="ロゴ">
+
+  <div id="spider-line"></div>
+  <div id="spider"></div>
+
+  <div id="title-container">
+    <div class="main-title">
+      <span class="kanji">幻</span>影旅団－蜘蛛－
+    </div>
+    <div class="sub-title">
+      ＜FF7EC GUILD PORTAL SITE ver.1.0＞
+    </div>
+  </div>
+
+  <div id="loginForm">
+    <div id="greetingMessage" class="greeting"></div>
+
+    <input type="text" id="userId" placeholder="ユーザーIDを入力">
+
+    <div class="auto-login">
+      <input type="checkbox" id="autoLoginCheck">
+      <label for="autoLoginCheck">ログイン状態を保持する</label>
+    </div>
+
+    <button id="loginBtn" class="login-button" onclick="login()">
+      <i class="fas fa-sign-in-alt"></i> ログイン
+    </button>
+
+    <button id="masterButton" class="login-button master-button" onclick="goToMaster()">
+      <i class="fas fa-cogs"></i> マスタメンテナンス
+    </button>
+
+    <button id="logoutBtn" class="login-button logout-button" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> ログアウト
+    </button>
+  </div>
+
+  <div id="quoteContainer"></div>
+
+  <script>
+    const guildMembers = JSON.parse(localStorage.getItem('guildMembers')) || [];
+    const userIdInput = document.getElementById('userId');
+    const autoLoginCheck = document.getElementById('autoLoginCheck');
+    const greetingMessage = document.getElementById('greetingMessage');
+
+    const logo = document.getElementById('logo');
+    const background = document.getElementById('background');
+    const loginForm = document.getElementById('loginForm');
+    const titleContainer = document.getElementById('title-container');
+    const spider = document.getElementById('spider');
+    const spiderLine = document.getElementById('spider-line');
+    const quoteContainer = document.getElementById('quoteContainer');
+
+    const quotes = [
+      "オレが許す…殺せ、邪魔する奴は残らずな",
+      "もう一度言ってやろうか？\nオレにとってこの状態は昼下がりのコーヒーブレイクと何ら変わらない平穏なものだ。",
+      "つまりこの状態は予言するほどのこともないとるに足らない出来事というわけだ。",
+      "見極めを誤るな。オレの命令は最優先、だがオレを最優先に生かすことはない",
+      "しんどー、ありゃ盗めねーわ",
+      "旅団（クモ）ではオレが頭でお前達は手足、手足は頭の指令に対して忠実に動くのが大原則だ。",
+      "例えば頭が死んでも誰かが跡を継げばいい、場合によっては頭より足の方が大事な時もあるだろう"
+    ];
+
+    let quoteInterval;
+
+    window.onload = () => {
+      setTimeout(() => {
+        titleContainer.style.opacity = 1;
+        titleContainer.style.top = "40px";
+        titleContainer.style.left = "40px";
+        titleContainer.style.transform = "translateX(0)";
+        logo.style.opacity = 1;
+        logo.style.bottom = "20px";
+        logo.style.right = "20px";
+        logo.style.transform = "none";
+      }, 8000);
+
+      setTimeout(() => {
+        background.style.opacity = 0.6;
+      }, 4000);
+
+      setTimeout(() => {
+        quoteInterval = setInterval(() => {
+          showRandomQuote();
+        }, 2500);
+      }, 2000);
+
+      setTimeout(() => {
+        clearInterval(quoteInterval);
+        spider.style.animation = 'spiderUp 4s forwards';
+        spiderLine.style.animation = 'lineUp 4s forwards';
+      }, 8000);
+
+      setTimeout(() => {
+        loginForm.style.opacity = 1;
+        checkStoredUser();
+      }, 9000);
+    };
+
+    function login() {
+      const userId = userIdInput.value.trim();
+      if (!userId) {
+        alert('ユーザーIDを入力してください');
+        return;
+      }
+
+      const member = guildMembers.find(m => m.id === userId);
+      if (!member) {
+        alert('登録されていないユーザーIDです');
+        return;
+      }
+
+      if (autoLoginCheck.checked) {
+        localStorage.setItem('userId', userId);
+      }
+
+      alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
+      window.location.href = `guild_battle_view.html?loginId=${userId}`;
+    }
+
+    function goToMaster() {
+      const userId = userIdInput.value.trim();
+
+      if (!userId) {
+        alert('ユーザーIDを入力してください');
+        return;
+      }
+
+      const member = guildMembers.find(m => m.id === userId);
+      if (!member || member.role !== 'GM') {
+        alert('ギルドマスターのみがマスタメンテナンスにアクセスできます');
+        return;
+      }
+
+      if (autoLoginCheck.checked) {
+        localStorage.setItem('userId', userId);
+      }
+
+      alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
+      window.location.href = `guild_master.html?loginId=${userId}`;
+    }
+
+    function logout() {
+      localStorage.removeItem('userId');
+      alert('ログアウトしました');
+      userIdInput.value = '';
+      greetingMessage.textContent = '';
+      autoLoginCheck.checked = false;
+    }
+
+    function checkStoredUser() {
+      const storedUserId = localStorage.getItem('userId');
+      if (storedUserId) {
+        userIdInput.value = storedUserId;
+        const member = guildMembers.find(m => m.id === storedUserId);
+        if (member) {
+          greetingMessage.textContent = `ようこそ！${member.name}さん、本日もよろしくお願いします！`;
+        }
+        autoLoginCheck.checked = true;
+      }
+    }
+
+    function showRandomQuote() {
+      const text = quotes[Math.floor(Math.random() * quotes.length)];
+      const quoteDiv = document.createElement('div');
+      quoteDiv.className = 'quote';
+      quoteDiv.innerText = text;
+
+      const maxWidth = window.innerWidth - 300;
+      const maxHeight = window.innerHeight - 100;
+      const randomX = Math.random() * maxWidth;
+      const randomY = Math.random() * maxHeight;
+      const randomSize = 14 + Math.random() * 30;
+
+      quoteDiv.style.left = `${randomX}px`;
+      quoteDiv.style.top = `${randomY}px`;
+      quoteDiv.style.fontSize = `${randomSize}px`;
+
+      quoteContainer.appendChild(quoteDiv);
+
+      setTimeout(() => { quoteDiv.style.opacity = 1; }, 100);
+      setTimeout(() => { quoteDiv.style.opacity = 0; }, 4000);
+      setTimeout(() => { quoteContainer.removeChild(quoteDiv); }, 6000);
+    }
+  </script>
+
+</body>
+</html>
