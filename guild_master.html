@@ -11,7 +11,7 @@
   const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
   const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
   <!-- Google Fonts と Font Awesome -->
@@ -422,12 +422,13 @@ async function addMember() {
     return;
   }
 
-  // ✅ デバッグ用ログ（コンソールで中身が見える）
-  console.log("登録データ:", { id, name, role, level, power, joined_at, note });
+  // ✅ デバッグログ（コンソールで確認）
+  console.log("登録データ:", { id, name, role: roleValue, level, power, joined_at, note });
 
-  const { data, error } = await db.from("guild_members").insert([
-    { id, name, role, level, power, joined_at, note }
-  ]);
+  // ✅ Supabase に登録
+  const { data, error } = await db
+    .from("guild_members")
+    .insert([{ id, name, role: roleValue, level, power, joined_at, note }]);
 
   if (!id || !name) {
     alert('IDと団員名は必須です');
