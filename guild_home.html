@@ -286,7 +286,16 @@
   <div id="quoteContainer"></div>
 
   <script>
-    const guildMembers = JSON.parse(localStorage.getItem('guildMembers')) || [];
+    let guildMembers = [];
+
+    async function fetchGuildMembers() {
+          const { data, error } = await supabase.from('guild_members').select('*');
+          if (error) {
+              console.error('メンバー情報の取得に失敗しました:', error.message);
+              return;
+          }
+          guildMembers = data;
+        }
     const userIdInput = document.getElementById('userId');
     const autoLoginCheck = document.getElementById('autoLoginCheck');
     const greetingMessage = document.getElementById('greetingMessage');
@@ -312,60 +321,66 @@
     let quoteInterval;
 
     window.onload = () => {
-      setTimeout(() => {
-        titleContainer.style.opacity = 1;
-        titleContainer.style.top = "40px";
-        titleContainer.style.left = "40px";
-        titleContainer.style.transform = "translateX(0)";
-        logo.style.opacity = 1;
-        logo.style.bottom = "20px";
-        logo.style.right = "20px";
-        logo.style.transform = "none";
-      }, 8000);
+  await fetchGuildMembers();
+  setTimeout(() => {
+    titleContainer.style.opacity = 1;
+    titleContainer.style.top = "40px";
+    titleContainer.style.left = "40px";
+    titleContainer.style.transform = "translateX(0)";
+    logo.style.opacity = 1;
+    logo.style.bottom = "20px";
+    logo.style.right = "20px";
+    logo.style.transform = "none";
+  }, 8000);
 
-      setTimeout(() => {
-        background.style.opacity = 0.6;
-      }, 4000);
+  setTimeout(() => {
+    background.style.opacity = 0.6;
+  }, 4000);
 
-      setTimeout(() => {
-        quoteInterval = setInterval(() => {
-          showRandomQuote();
-        }, 2500);
-      }, 2000);
+  setTimeout(() => {
+    quoteInterval = setInterval(() => {
+      showRandomQuote();
+    }, 2500);
+  }, 2000);
 
-      setTimeout(() => {
-        clearInterval(quoteInterval);
-        spider.style.animation = 'spiderUp 4s forwards';
-        spiderLine.style.animation = 'lineUp 4s forwards';
-      }, 8000);
+  setTimeout(() => {
+    clearInterval(quoteInterval);
+    spider.style.animation = 'spiderUp 4s forwards';
+    spiderLine.style.animation = 'lineUp 4s forwards';
+  }, 8000);
 
-      setTimeout(() => {
-        loginForm.style.opacity = 1;
-        checkStoredUser();
-      }, 9000);
-    };
+  setTimeout(() => {
+    loginForm.style.opacity = 1;
+    checkStoredUser();
+  }, 9000);
+};
 
-    function login() {
-      const userId = userIdInput.value.trim();
-      if (!userId) {
-        alert('ユーザーIDを入力してください');
-        return;
-      }
+async function login() {
+  const userId = userIdInput.value.trim();
+  if (!userId) {
+    alert('ユーザーIDを入力してください');
+    return;
+  }
 
-      const member = guildMembers.find(m => m.id === userId);
-      if (!member) {
-        alert('登録されていないユーザーIDです');
-        return;
-      }
+  // Supabase からユーザー情報を取得
+  const { data: member, error } = await supabase
+    .from('guild_members')
+    .select('*')
+    .eq('id', userId)
+    .single();
 
-      if (autoLoginCheck.checked) {
-        localStorage.setItem('userId', userId);
-      }
+  if (error || !member) {
+    alert('登録されていないユーザーIDです');
+    return;
+  }
 
-      alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
-      window.location.href = `guild_battle_view.html?loginId=${userId}`;
-    }
+  if (autoLoginCheck.checked) {
+    localStorage.setItem('userId', userId);
+  }
 
+  alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
+  window.location.href = `guild_battle_view.html?loginId=${userId}`;
+}
     function goToMaster() {
       const userId = userIdInput.value.trim();
 
@@ -374,28 +389,41 @@
         return;
       }
 
-      const member = guildMembers.find(m => m.id === userId);
-      if (!member || member.role !== 'GM') {
-        alert('ギルドマスターのみがマスタメンテナンスにアクセスできます');
-        return;
-      }
+async function goToMaster() {
+  const userId = userIdInput.value.trim();
 
-      if (autoLoginCheck.checked) {
-        localStorage.setItem('userId', userId);
-      }
+  if (!userId) {
+    alert('ユーザーIDを入力してください');
+    return;
+  }
 
-      alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
-      window.location.href = `guild_master.html?loginId=${userId}`;
-    }
+  const { data: member, error } = await supabase
+    .from('guild_members')
+    .select('role, name')
+    .eq('id', userId)
+    .single();
 
-    function logout() {
-      localStorage.removeItem('userId');
-      alert('ログアウトしました');
-      userIdInput.value = '';
-      greetingMessage.textContent = '';
-      autoLoginCheck.checked = false;
-    }
+  if (error || !member || member.role !== 'GM') {
+    alert('ギルドマスターのみがマスタメンテナンスにアクセスできます');
+    return;
+  }
 
+  if (autoLoginCheck.checked) {
+    localStorage.setItem('userId', userId);
+  }
+
+  alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
+  window.location.href = `guild_master.html?loginId=${userId}`;
+}
+
+function logout() {
+  localStorage.removeItem('userId');
+  sessionStorage.clear();
+  alert('ログアウトしました');
+  userIdInput.value = '';
+  greetingMessage.textContent = '';
+  autoLoginCheck.checked = false;
+}
     function checkStoredUser() {
       const storedUserId = localStorage.getItem('userId');
       if (storedUserId) {
