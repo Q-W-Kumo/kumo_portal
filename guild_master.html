@@ -494,10 +494,10 @@ async function addMember() {
   const roleMapping = {
     "GM": "GM",
     "SM": "SM",
-    "一般": "member"  // Supabaseでは"一般"を"MEMBER"に変換
+    "一般": "member"  // Supabaseでは"一般"を"member"に変換
   };
 
-  role = roleMapping[role] || "member"; // 万が一、変換に失敗しても"MEMBER"とする
+  role = roleMapping[role] || "member"; // 万が一、変換に失敗しても"member"とする
 
   // ✅ 必須項目のチェック
   if (!id || !name) {
@@ -505,17 +505,37 @@ async function addMember() {
     return;
   }
 
-  // ✅ Supabase にデータ登録
-  const { data, error } = await db.from('guild_members').insert([
-    { id, name, role, level, power, joined_at, note }
-  ]);
+  // ✅ 既存データがあるかチェック
+  const { data: existingMember, error: fetchError } = await db
+    .from('guild_members')
+    .select('id')
+    .eq('id', id)
+    .single();
 
-  if (error) {
-    alert('登録に失敗しました: ' + error.message);
+  if (fetchError && fetchError.code !== "PGRST116") {
+    alert('データ確認に失敗しました: ' + fetchError.message);
     return;
   }
 
-  alert('✅ メンバー登録が完了しました');
+  let result;
+  if (existingMember) {
+    // ✅ 既に存在する場合は更新（UPDATE）
+    result = await db.from('guild_members').update({
+      name, role, level, power, joined_at, note
+    }).eq('id', id);
+  } else {
+    // ✅ 存在しない場合は新規登録（INSERT）
+    result = await db.from('guild_members').insert([
+      { id, name, role, level, power, joined_at, note }
+    ]);
+  }
+
+  if (result.error) {
+    alert('登録に失敗しました: ' + result.error.message);
+    return;
+  }
+
+  alert(existingMember ? '✅ メンバー情報を更新しました' : '✅ メンバー登録が完了しました');
 
   // ✅ フォームをクリア
   clearMemberForm();
@@ -523,7 +543,8 @@ async function addMember() {
   // ✅ 最新の一覧を取得して更新
   renderMembers();
 }
-function clearMemberForm() {
+  
+  function clearMemberForm() {
   document.getElementById('memberId').value = '';
   document.getElementById('memberName').value = '';
   document.getElementById('memberRole').value = '一般';
@@ -583,21 +604,29 @@ async function renderMembers() {
   });
 }
 
-  function editMember(id) {
-  const members = JSON.parse(localStorage.getItem('guildMembers')) || [];
-  const member = members.find(m => m.id === id);
-  if (!member) return;
+async function editMember(id) {
+  const { data: member, error } = await db
+    .from("guild_members")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  document.getElementById('memberId').value = member.id;
-  document.getElementById('memberName').value = member.name;
-  document.getElementById('memberRole').value = member.role;
-  document.getElementById('memberLevel').value = member.level;
-  document.getElementById('memberPower').value = member.power;
-  document.getElementById('memberJoinDate').value = member.joinDate;
-  document.getElementById('memberNote').value = member.note;
+  if (error) {
+    alert("メンバー情報の取得に失敗しました: " + error.message);
+    return;
+  }
+
+  // ✅ 取得したデータをフォームにセット
+  document.getElementById("memberId").value = member.id;
+  document.getElementById("memberName").value = member.name;
+  document.getElementById("memberRole").value = member.role;
+  document.getElementById("memberLevel").value = member.level;
+  document.getElementById("memberPower").value = member.power;
+  document.getElementById("memberJoinDate").value = member.joined_at || "";
+  document.getElementById("memberNote").value = member.note || "";
 }
 
-function withdrawMember(id) {
+  function withdrawMember(id) {
   if (!confirm('このメンバーを脱退させますか？')) return;
 
   let members = JSON.parse(localStorage.getItem('guildMembers')) || [];
