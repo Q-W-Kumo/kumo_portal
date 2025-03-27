@@ -28,27 +28,25 @@
       color: #fff;
     }
 
-    #background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://i.imgur.com/vWms7U9.jpeg') center center / cover no-repeat;
-      opacity: 0;
-      transition: opacity 5s ease-in-out;
-      z-index: 1;
-    }
-
-    #noise {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif') center center / cover no-repeat;
-      opacity: 0.8;
-      z-index: 2;
-      pointer-events: none;
-      animation: noiseFadeOut 8s forwards;
-    }
-
+#background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: url('https://i.imgur.com/vWms7U9.jpeg') center center / cover no-repeat;
+  opacity: 0.3;  /* 初期値を少し明るく */
+  transition: opacity 3s ease-in-out;
+  z-index: 1;
+}
+#noise {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif') center center / cover no-repeat;
+  opacity: 0.5;  /* 初期の透明度を下げる */
+  z-index: 2;
+  pointer-events: none;
+  animation: noiseFadeOut 6s forwards; /* フェードアウトを少し早める */
+}
     @keyframes noiseFadeOut {
       0% { opacity: 0.8; }
       50% { opacity: 0.4; }
@@ -322,20 +320,17 @@
 
     window.onload = () => {
   await fetchGuildMembers();
-  setTimeout(() => {
-    titleContainer.style.opacity = 1;
-    titleContainer.style.top = "40px";
-    titleContainer.style.left = "40px";
-    titleContainer.style.transform = "translateX(0)";
-    logo.style.opacity = 1;
-    logo.style.bottom = "20px";
-    logo.style.right = "20px";
-    logo.style.transform = "none";
-  }, 8000);
 
-  setTimeout(() => {
-    background.style.opacity = 0.6;
-  }, 4000);
+setTimeout(() => {
+  titleContainer.style.opacity = 1;
+  titleContainer.style.top = "40px";
+  titleContainer.style.left = "40px";
+  titleContainer.style.transform = "translateX(0)";
+}, 3000); // 3秒後にフェードイン開始（通常より早く）
+
+setTimeout(() => {
+  background.style.opacity = 0.7; // 最終的な明るさを増やす
+}, 2000);  // 2秒後にフェードインを開始（遅延を短縮）
 
   setTimeout(() => {
     quoteInterval = setInterval(() => {
