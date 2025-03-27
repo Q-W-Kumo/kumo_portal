@@ -465,17 +465,33 @@ function goHome() {
   window.location.href = 'guild_home.html';
 }
 
-function limitRoles(select) {
+async function limitRoles(select) {
   const role = select.value;
-  const members = JSON.parse(localStorage.getItem('guildMembers')) || [];
-  const gmCount = members.filter(m => m.role === 'GM').length;
-  const smCount = members.filter(m => m.role === 'SM').length;
 
-  if (role === 'GM' && gmCount >= 1) {
+  // ✅ SupabaseからGMとSMの数を取得
+  const { data: gmCount, error: gmError } = await db
+    .from('guild_members')
+    .select('id', { count: 'exact' })
+    .eq('role', 'GM');
+
+  const { data: smCount, error: smError } = await db
+    .from('guild_members')
+    .select('id', { count: 'exact' })
+    .eq('role', 'SM');
+
+  if (gmError || smError) {
+    alert('役割のカウント取得に失敗しました: ' + (gmError?.message || smError?.message));
+    return;
+  }
+
+  // ✅ GMが1人以上いる場合、新たにGMを選べないようにする
+  if (role === "GM" && gmCount.length >= 1) {
     alert('ギルドマスターは1名のみ設定可能です');
     select.value = '一般';
   }
-  if (role === 'SM' && smCount >= 4) {
+
+  // ✅ SMが4人以上いる場合、新たにSMを選べないようにする
+  if (role === "SM" && smCount.length >= 4) {
     alert('サブマスターは4名まで設定可能です');
     select.value = '一般';
   }
