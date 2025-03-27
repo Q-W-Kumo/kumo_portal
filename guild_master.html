@@ -494,10 +494,10 @@ async function addMember() {
   const roleMapping = {
     "GM": "GM",
     "SM": "SM",
-    "一般": "MEMBER"  // Supabaseでは"一般"を"MEMBER"に変換
+    "一般": "member"  // Supabaseでは"一般"を"MEMBER"に変換
   };
 
-  role = roleMapping[role] || "MEMBER"; // 万が一、変換に失敗しても"MEMBER"とする
+  role = roleMapping[role] || "member"; // 万が一、変換に失敗しても"MEMBER"とする
 
   // ✅ 必須項目のチェック
   if (!id || !name) {
