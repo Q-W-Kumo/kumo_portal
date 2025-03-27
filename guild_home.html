@@ -9,6 +9,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 
+<!-- Supabase SDKの読み込み -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let guildMembers = [];
+
+  async function fetchGuildMembers() {
+    const { data, error } = await db.from("guild_members").select("*");
+    if (error) {
+      console.error("ギルドメンバーの取得に失敗:", error.message);
+      return;
+    }
+    guildMembers = data;
+  }
   <style>
     body {
       margin: 0;
@@ -336,70 +353,71 @@
       }, 9000);
     };
 
-    function login() {
-      const userId = userIdInput.value.trim();
-      if (!userId) {
-        alert('ユーザーIDを入力してください');
-        return;
-      }
-
-      const member = guildMembers.find(m => m.id === userId);
-      if (!member) {
-        alert('登録されていないユーザーIDです');
-        return;
-      }
-
-      if (autoLoginCheck.checked) {
-        localStorage.setItem('userId', userId);
-      }
-
-      alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
-      window.location.href = `guild_battle_view.html?loginId=${userId}`;
+  async function login() {
+    const userId = document.getElementById('userId').value.trim();
+    if (!userId) {
+      alert('ユーザーIDを入力してください');
+      return;
     }
 
-    function goToMaster() {
-      const userId = userIdInput.value.trim();
-
-      if (!userId) {
-        alert('ユーザーIDを入力してください');
-        return;
-      }
-
-      const member = guildMembers.find(m => m.id === userId);
-      if (!member || member.role !== 'GM') {
-        alert('ギルドマスターのみがマスタメンテナンスにアクセスできます');
-        return;
-      }
-
-      if (autoLoginCheck.checked) {
-        localStorage.setItem('userId', userId);
-      }
-
-      alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
-      window.location.href = `guild_master.html?loginId=${userId}`;
+    // Supabaseのデータから該当ユーザーを検索
+    const member = guildMembers.find(m => m.id === userId);
+    if (!member) {
+      alert('登録されていないユーザーIDです');
+      return;
     }
 
-    function logout() {
-      localStorage.removeItem('userId');
-      alert('ログアウトしました');
-      userIdInput.value = '';
-      greetingMessage.textContent = '';
-      autoLoginCheck.checked = false;
+    // ログイン状態を保持
+    if (document.getElementById('autoLoginCheck').checked) {
+      localStorage.setItem('userId', userId);
     }
 
-    function checkStoredUser() {
-      const storedUserId = localStorage.getItem('userId');
-      if (storedUserId) {
-        userIdInput.value = storedUserId;
-        const member = guildMembers.find(m => m.id === storedUserId);
-        if (member) {
-          greetingMessage.textContent = `ようこそ！${member.name}さん、本日もよろしくお願いします！`;
-        }
-        autoLoginCheck.checked = true;
+    alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
+    window.location.href = `guild_battle_view.html?loginId=${userId}`;
+  }
+
+  async function goToMaster() {
+    const userId = document.getElementById('userId').value.trim();
+    if (!userId) {
+      alert('ユーザーIDを入力してください');
+      return;
+    }
+
+    const member = guildMembers.find(m => m.id === userId);
+    if (!member || member.role !== 'GM') {
+      alert('ギルドマスターのみがマスタメンテナンスにアクセスできます');
+      return;
+    }
+
+    if (document.getElementById('autoLoginCheck').checked) {
+      localStorage.setItem('userId', userId);
+    }
+
+    alert(`ようこそ！${member.name}さん、本日もよろしくお願いします！`);
+    window.location.href = `guild_master.html?loginId=${userId}`;
+  }
+
+  function logout() {
+    localStorage.removeItem('userId');
+    alert('ログアウトしました');
+    document.getElementById('userId').value = '';
+    document.getElementById('greetingMessage').textContent = '';
+    document.getElementById('autoLoginCheck').checked = false;
+  }
+
+  function checkStoredUser() {
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      document.getElementById('userId').value = storedUserId;
+      const member = guildMembers.find(m => m.id === storedUserId);
+      if (member) {
+        document.getElementById('greetingMessage').textContent = `ようこそ！${member.name}さん、本日もよろしくお願いします！`;
       }
+      document.getElementById('autoLoginCheck').checked = true;
     }
-
-    function showRandomQuote() {
+  }
+  
+  function showRandomQuote() {
       const text = quotes[Math.floor(Math.random() * quotes.length)];
       const quoteDiv = document.createElement('div');
       quoteDiv.className = 'quote';
@@ -421,7 +439,12 @@
       setTimeout(() => { quoteDiv.style.opacity = 0; }, 4000);
       setTimeout(() => { quoteContainer.removeChild(quoteDiv); }, 6000);
     }
-  </script>
 
+  window.onload = async () => {
+    await fetchGuildMembers(); // Supabaseからギルドメンバー情報を取得
+    checkStoredUser();         // 保存されているユーザーIDをチェック
+  };
+
+</script>
 </body>
 </html>
