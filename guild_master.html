@@ -484,11 +484,20 @@ function limitRoles(select) {
 async function addMember() {
   const id = document.getElementById('memberId').value;
   const name = document.getElementById('memberName').value;
-  const role = document.getElementById('memberRole').value;
+  let role = document.getElementById('memberRole').value;
   const level = parseInt(document.getElementById('memberLevel').value) || 0;
   const power = parseInt(document.getElementById('memberPower').value) || 0;
   const joined_at = document.getElementById('memberJoinDate').value;
   const note = document.getElementById('memberNote').value;
+
+  // ✅ role の値を Supabase に合わせる
+  const roleMapping = {
+    "GM": "GM",
+    "SM": "SM",
+    "一般": "MEMBER"  // Supabaseでは"一般"を"MEMBER"に変換
+  };
+
+  role = roleMapping[role] || "MEMBER"; // 万が一、変換に失敗しても"MEMBER"とする
 
   // ✅ 必須項目のチェック
   if (!id || !name) {
@@ -507,7 +516,7 @@ async function addMember() {
   }
 
   alert('✅ メンバー登録が完了しました');
-  
+
   // ✅ フォームをクリア
   clearMemberForm();
 
