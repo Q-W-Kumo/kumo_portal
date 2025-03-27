@@ -678,13 +678,8 @@ async function deleteMember(id) {
   renderMembers();
 }
 
-  function saveGuildSettings() {
+async function saveGuildSettings() {
   const round = document.getElementById('battleRound').value;
-  if (!round) {
-    alert('開催回を選択してください');
-    return;
-  }
-
   const enemyTarget = document.getElementById('enemyTarget').value;
   const attributes = Array.from(document.querySelectorAll('.element-checkbox:checked')).map(cb => cb.value);
   const types = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(cb => cb.value);
@@ -695,56 +690,88 @@ async function deleteMember(id) {
   const mainBattleDay3 = document.getElementById('mainBattleDay3').value;
   const bgImageUrl = document.getElementById('bgImageUrl').value;
 
-  let settings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
-  const existingIndex = settings.findIndex(s => s.round === round);
+  if (!round || !enemyTarget) {
+    alert('開催回と対象エネミーは必須です');
+    return;
+  }
+
+  // Supabase で既存データがあるか確認
+  const { data: existing, error: fetchError } = await db
+    .from('guild_battle_settings')
+    .select('id')
+    .eq('round', round)
+    .maybeSingle();
+
+  if (fetchError) {
+    alert('設定取得に失敗しました: ' + fetchError.message);
+    return;
+  }
 
   const settingData = {
     round,
-    enemyTarget,
+    enemy_target: enemyTarget,
     attributes,
     type: types,
-    practiceStartDate,
-    practiceEndDate,
-    mainBattleDay1,
-    mainBattleDay2,
-    mainBattleDay3,
-    bgImageUrl,
-    status: existingIndex !== -1 ? settings[existingIndex].status : 'finished'
+    practice_start_date: practiceStartDate || null,
+    practice_end_date: practiceEndDate || null,
+    main_battle_day1: mainBattleDay1 || null,
+    main_battle_day2: mainBattleDay2 || null,
+    main_battle_day3: mainBattleDay3 || null,
+    bg_image_url: bgImageUrl || null,
+    status: existing ? existing.status : 'finished'
   };
 
-  if (existingIndex !== -1) {
-    settings[existingIndex] = settingData;
+  let result;
+  if (existing) {
+    // 更新処理
+    result = await db
+      .from('guild_battle_settings')
+      .update(settingData)
+      .eq('id', existing.id);
   } else {
-    settings.push(settingData);
+    // 新規登録
+    result = await db
+      .from('guild_battle_settings')
+      .insert([settingData]);
   }
 
-  localStorage.setItem('guildBattleSettings', JSON.stringify(settings));
-  alert('設定を保存しました');
-  renderBattleSettings();
+  if (result.error) {
+    alert('設定の保存に失敗しました: ' + result.error.message);
+  } else {
+    alert('✅ 設定を保存しました');
+    renderBattleSettings(); // 最新データを反映
+  }
 }
 
-function renderBattleSettings() {
-  const settings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
+async function renderBattleSettings() {
+  const { data: settings, error } = await db
+    .from('guild_battle_settings')
+    .select('*');
+
+  if (error) {
+    alert('設定データの取得に失敗しました: ' + error.message);
+    return;
+  }
+
   const tbody = document.getElementById('battleSettingsTableBody');
   tbody.innerHTML = '';
 
   settings.forEach(setting => {
     const statusClass = setting.status === 'ongoing' ? 'status-ongoing' : 'status-finished';
-
-    const bgImgHtml = setting.bgImageUrl
-      ? `<img src="${setting.bgImageUrl}" width="50" height="50" style="object-fit: cover;">`
+    const bgImgHtml = setting.bg_image_url
+      ? `<img src="${setting.bg_image_url}" width="50" height="50" style="object-fit: cover;">`
       : '未設定';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${setting.round}</td>
-      <td>${setting.enemyTarget}</td>
-      <td>${setting.attributes.join(',')}</td>
-      <td>${setting.type.join(',')}</td>
-      <td>${setting.practiceStartDate}〜${setting.practiceEndDate}</td>
-      <td>${setting.mainBattleDay1}</td>
-      <td>${setting.mainBattleDay2}</td>
-      <td>${setting.mainBattleDay3}</td>
+      <td>${setting.enemy_target}</td>
+      <td>${setting.attributes.join(', ')}</td>
+      <td>${setting.type.join(', ')}</td>
+      <td>${setting.practice_start_date || ''}〜${setting.practice_end_date || ''}</td>
+      <td>${setting.main_battle_day1 || ''}</td>
+      <td>${setting.main_battle_day2 || ''}</td>
+      <td>${setting.main_battle_day3 || ''}</td>
       <td>${bgImgHtml}</td>
       <td class="${statusClass}">${setting.status === 'ongoing' ? '開催中' : '終了'}</td>
       <td>
@@ -756,59 +783,76 @@ function renderBattleSettings() {
   });
 }
 
-  function deleteSetting(round) {
-    if (!confirm('この設定を削除しますか？')) return;
+async function deleteSetting(round) {
+  if (!confirm('この設定を削除しますか？')) return;
 
-    let settings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
-    settings = settings.filter(s => s.round !== round);
-    localStorage.setItem('guildBattleSettings', JSON.stringify(settings));
-    renderBattleSettings();
+  const { error } = await db
+    .from('guild_battle_settings')
+    .delete()
+    .eq('round', round);
+
+  if (error) {
+    alert('削除に失敗しました: ' + error.message);
+    return;
   }
+
+  alert('設定を削除しました');
+  renderBattleSettings();
+}
 
   // ✅ 新規追加（編集ボタン処理）
-  function editSetting(round) {
-    const settings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
-    const setting = settings.find(s => s.round === round);
-    if (!setting) {
-      alert('データが見つかりません');
-      return;
-    }
+async function editSetting(round) {
+  const { data: setting, error } = await db
+    .from('guild_battle_settings')
+    .select('*')
+    .eq('round', round)
+    .maybeSingle();
 
-    document.getElementById('battleRound').value = setting.round;
-    document.getElementById('enemyTarget').value = setting.enemyTarget;
-    document.getElementById('practiceStartDate').value = setting.practiceStartDate;
-    document.getElementById('practiceEndDate').value = setting.practiceEndDate;
-    document.getElementById('mainBattleDay1').value = setting.mainBattleDay1;
-    document.getElementById('mainBattleDay2').value = setting.mainBattleDay2;
-    document.getElementById('mainBattleDay3').value = setting.mainBattleDay3;
-    document.getElementById('bgImageUrl').value = setting.bgImageUrl;
-
-    document.querySelectorAll('.element-checkbox').forEach(cb => {
-      cb.checked = setting.attributes.includes(cb.value);
-    });
-
-    document.querySelectorAll('.type-checkbox').forEach(cb => {
-      cb.checked = setting.type.includes(cb.value);
-    });
-
-    alert(`「${setting.round}」のデータを編集モードで読み込みました`);
+  if (error || !setting) {
+    alert('データが見つかりません');
+    return;
   }
 
-  function updateStatus(status) {
-    const round = document.getElementById('battleRound').value;
-    if (!round) {
-      alert('開催回を選択してください');
-      return;
-    }
+  document.getElementById('battleRound').value = setting.round;
+  document.getElementById('enemyTarget').value = setting.enemy_target;
+  document.getElementById('practiceStartDate').value = setting.practice_start_date || '';
+  document.getElementById('practiceEndDate').value = setting.practice_end_date || '';
+  document.getElementById('mainBattleDay1').value = setting.main_battle_day1 || '';
+  document.getElementById('mainBattleDay2').value = setting.main_battle_day2 || '';
+  document.getElementById('mainBattleDay3').value = setting.main_battle_day3 || '';
+  document.getElementById('bgImageUrl').value = setting.bg_image_url || '';
 
-    let settings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
-    const setting = settings.find(s => s.round === round);
-    if (!setting) return;
+  document.querySelectorAll('.element-checkbox').forEach(cb => {
+    cb.checked = setting.attributes.includes(cb.value);
+  });
 
-    setting.status = status;
-    localStorage.setItem('guildBattleSettings', JSON.stringify(settings));
-    renderBattleSettings();
+  document.querySelectorAll('.type-checkbox').forEach(cb => {
+    cb.checked = setting.type.includes(cb.value);
+  });
+
+  alert(`「${setting.round}」のデータを編集モードで読み込みました`);
+}
+
+async function updateStatus(status) {
+  const round = document.getElementById('battleRound').value;
+  if (!round) {
+    alert('開催回を選択してください');
+    return;
   }
+
+  const { error } = await db
+    .from('guild_battle_settings')
+    .update({ status })
+    .eq('round', round);
+
+  if (error) {
+    alert('ステータス更新に失敗しました: ' + error.message);
+    return;
+  }
+
+  alert(`ステータスを「${status}」に更新しました`);
+  renderBattleSettings();
+}
 
   window.onload = () => {
     renderMembers();
