@@ -11,7 +11,7 @@
   const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
   const { createClient } = supabase;
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
   <!-- Google Fonts と Font Awesome -->
@@ -285,7 +285,7 @@
         <label>開催回</label>
         <select id="battleRound">
           <option value="">選択してください</option>
-          <script>for (let i = 1; i <= 50; i++) document.write(`<option value="第${i}回">第${i}回</option>`);</script>
+          <script>for (let i = 1; i <= 50; i++) document.write(<option value="第${i}回">第${i}回</option>);</script>
         </select>
 
         <label>対象エネミー</label>
@@ -381,20 +381,20 @@
   const urlParams = new URLSearchParams(window.location.search);
   const loginId = urlParams.get('loginId') || '未取得';
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
+    document.getElementById('loginIdBox').textContent = ログインID: ${loginId};
     renderMembers();       // 初期表示用メンバー取得
     renderBattleSettings(); // 初期表示用バトル設定取得
   });
 
   function navigatePage(page) {
-    window.location.href = `${page}?loginId=${loginId}`;
+    window.location.href = ${page}?loginId=${loginId};
   }
 
   function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+    document.querySelector(.tab[onclick="switchTab('${tabId}')"]).classList.add('active');
   }
 
   function clearMemberForm() {
@@ -422,13 +422,12 @@ async function addMember() {
     return;
   }
 
-  // ✅ デバッグログ（コンソールで確認）
-  console.log("登録データ:", { id, name, role: roleValue, level, power, joined_at, note });
+  // ✅ デバッグ用ログ（コンソールで中身が見える）
+  console.log("登録データ:", { id, name, role, level, power, joined_at, note });
 
-  // ✅ Supabase に登録
-  const { data, error } = await db
-    .from("guild_members")
-    .insert([{ id, name, role: roleValue, level, power, joined_at, note }]);
+  const { data, error } = await db.from("guild_members").insert([
+    { id, name, role, level, power, joined_at, note }
+  ]);
 
   if (!id || !name) {
     alert('IDと団員名は必須です');
@@ -493,7 +492,7 @@ async function addMember() {
                             member.role === 'SM' ? 'role-sm' :
                             member.role === 'DFN' ? 'role-dfn' : 'role-general';
 
-      tr.innerHTML = `
+      tr.innerHTML = 
         <td>${member.id}</td>
         <td><span class="role-icon ${roleIconClass}">${member.role}</span></td>
         <td>${member.name}</td>
@@ -503,10 +502,10 @@ async function addMember() {
         <td>${member.note || ''}</td>
         <td>
           <button class="action-btn" onclick="editMember('${member.id}')">編集</button>
-          ${member.role !== 'DFN' ? `<button class="action-btn" onclick="withdrawMember('${member.id}')">脱退</button>` : ''}
-          ${member.role === 'DFN' ? `<button class="action-btn" onclick="deleteMember('${member.id}')">削除</button>` : ''}
+          ${member.role !== 'DFN' ? <button class="action-btn" onclick="withdrawMember('${member.id}')">脱退</button> : ''}
+          ${member.role === 'DFN' ? <button class="action-btn" onclick="deleteMember('${member.id}')">削除</button> : ''}
         </td>
-      `;
+      ;
       tbody.appendChild(tr);
     });
   }
@@ -583,9 +582,9 @@ async function addMember() {
 
   function renderBattleSettings() {
     // ダミーで非表示
-    document.getElementById("battleSettingsTableBody").innerHTML = `
+    document.getElementById("battleSettingsTableBody").innerHTML = 
       <tr><td colspan="11">※ギルドバトル設定は現在ローカル処理です（Supabase化も可能）</td></tr>
-    `;
+    ;
   }
 
   function editSetting(round) {
@@ -597,7 +596,7 @@ async function addMember() {
   }
 
   function updateStatus(status) {
-    alert(`現在、バトル設定のステータス更新（${status}）は未実装です`);
+    alert(現在、バトル設定のステータス更新（${status}）は未実装です);
   }
 </script>
 <script>
@@ -609,11 +608,11 @@ async function addMember() {
   // ===== ログインID取得・表示 =====
   const urlParams = new URLSearchParams(window.location.search);
   const loginId = urlParams.get('loginId') || '未取得';
-  document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
+  document.getElementById('loginIdBox').textContent = ログインID: ${loginId};
 
   // ===== ページ遷移関数（loginId付き） =====
   function navigatePage(page) {
-    window.location.href = `${page}?loginId=${loginId}`;
+    window.location.href = ${page}?loginId=${loginId};
   }
 
   // タブ切り替え
@@ -621,7 +620,7 @@ async function addMember() {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+    document.querySelector(.tab[onclick="switchTab('${tabId}')"]).classList.add('active');
   }
 
   // ページロード時の初期表示
