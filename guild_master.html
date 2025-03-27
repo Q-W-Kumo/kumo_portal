@@ -626,28 +626,43 @@ async function editMember(id) {
   document.getElementById("memberNote").value = member.note || "";
 }
 
-  function withdrawMember(id) {
+// ✅ メンバーを脱退（役割を DFN に変更）
+async function withdrawMember(id) {
   if (!confirm('このメンバーを脱退させますか？')) return;
 
-  let members = JSON.parse(localStorage.getItem('guildMembers')) || [];
-  const member = members.find(m => m.id === id);
-  if (!member) return;
+  const { error } = await db
+    .from('guild_members')
+    .update({ role: 'DFN' })  // 役職を "DFN" に変更
+    .eq('id', id);
 
-  member.role = 'DFN';
-  localStorage.setItem('guildMembers', JSON.stringify(members));
+  if (error) {
+    alert('脱退処理に失敗しました: ' + error.message);
+    return;
+  }
+
+  alert('✅ メンバーを脱退させました');
   renderMembers();
 }
 
-function deleteMember(id) {
+// ✅ メンバーを完全削除
+async function deleteMember(id) {
   if (!confirm('このメンバーを完全に削除しますか？')) return;
 
-  let members = JSON.parse(localStorage.getItem('guildMembers')) || [];
-  members = members.filter(m => m.id !== id);
-  localStorage.setItem('guildMembers', JSON.stringify(members));
+  const { error } = await db
+    .from('guild_members')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    alert('削除に失敗しました: ' + error.message);
+    return;
+  }
+
+  alert('✅ メンバーを削除しました');
   renderMembers();
 }
 
-function saveGuildSettings() {
+  function saveGuildSettings() {
   const round = document.getElementById('battleRound').value;
   if (!round) {
     alert('開催回を選択してください');
