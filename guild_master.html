@@ -481,37 +481,39 @@ function limitRoles(select) {
   }
 }
 
-function addMember() {
+async function addMember() {
   const id = document.getElementById('memberId').value;
   const name = document.getElementById('memberName').value;
   const role = document.getElementById('memberRole').value;
-  const level = document.getElementById('memberLevel').value;
-  const power = document.getElementById('memberPower').value;
-  const joinDate = document.getElementById('memberJoinDate').value;
+  const level = parseInt(document.getElementById('memberLevel').value) || 0;
+  const power = parseInt(document.getElementById('memberPower').value) || 0;
+  const joined_at = document.getElementById('memberJoinDate').value;
   const note = document.getElementById('memberNote').value;
 
+  // ✅ 必須項目のチェック
   if (!id || !name) {
     alert('IDと団員名は必須です');
     return;
   }
 
-  let members = JSON.parse(localStorage.getItem('guildMembers')) || [];
-  const existingIndex = members.findIndex(m => m.id === id);
+  // ✅ Supabase にデータ登録
+  const { data, error } = await db.from('guild_members').insert([
+    { id, name, role, level, power, joined_at, note }
+  ]);
 
-  const memberData = { id, name, role, level, power, joinDate, note };
-
-  if (existingIndex !== -1) {
-    members[existingIndex] = memberData;
-  } else {
-    members.push(memberData);
+  if (error) {
+    alert('登録に失敗しました: ' + error.message);
+    return;
   }
 
-  localStorage.setItem('guildMembers', JSON.stringify(members));
-  alert('メンバーを登録しました');
+  alert('✅ メンバー登録が完了しました');
+  
+  // ✅ フォームをクリア
   clearMemberForm();
+
+  // ✅ 最新の一覧を取得して更新
   renderMembers();
 }
-
 function clearMemberForm() {
   document.getElementById('memberId').value = '';
   document.getElementById('memberName').value = '';
