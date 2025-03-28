@@ -89,43 +89,54 @@
       }
     });
 
-    async function login() {
-      const userId = document.getElementById("userId").value;
-      const rememberMe = document.getElementById("rememberMe").checked;
+async function login() {
+  const userId = document.getElementById("userId").value;
+  const rememberMe = document.getElementById("rememberMe").checked;
 
-      if (!userId) {
-        alert("ユーザーIDを入力してください");
-        return;
-      }
+  if (!userId) {
+    alert("ユーザーIDを入力してください");
+    return;
+  }
 
-      // 🔹 Supabase からユーザー情報を取得
-      let { data, error } = await db
-        .from("guild_members")
-        .select("id, role")
-        .eq("id", userId)
-        .single();
+  console.log("🔍 入力されたユーザーID:", userId);
 
-      if (error || !data) {
-        alert("ユーザーが見つかりません");
-        return;
-      }
+  // 🔹 Supabase からユーザー情報を取得
+  let { data, error } = await db
+    .from("guild_members")
+    .select("id, role")
+    .eq("id", userId)
+    .single();
 
-      // ユーザー情報を sessionStorage に保存
-      sessionStorage.setItem("loginId", data.id);
-      sessionStorage.setItem("loginRole", data.role);
+  console.log("🛠️ Supabase からのレスポンス:", data, error);
 
-      if (rememberMe) {
-        localStorage.setItem("userId", userId);
-      } else {
-        localStorage.removeItem("userId");
-      }
+  if (error || !data) {
+    alert("ユーザーが見つかりません");
+    return;
+  }
 
-      alert(`ログイン成功: ${data.id} (${data.role})`);
-      
-      // ✅ 役割に応じてリダイレクト
-      window.location.href = "guild_home.html";
-    }
+  // ユーザー情報を sessionStorage に保存
+  sessionStorage.setItem("loginId", data.id);
+  sessionStorage.setItem("loginRole", data.role);
 
+  console.log("✅ セッションに保存されたデータ:", {
+    loginId: sessionStorage.getItem("loginId"),
+    loginRole: sessionStorage.getItem("loginRole"),
+  });
+
+  if (rememberMe) {
+    localStorage.setItem("userId", userId);
+  } else {
+    localStorage.removeItem("userId");
+  }
+
+  alert(`ログイン成功: ${data.id} (${data.role})`);
+  
+  // ✅ ここでコンソールにログを出力
+  console.log("🔄 ページ遷移を実行: guild_home.html");
+  
+  // ✅ 正常に遷移させる
+  window.location.href = "guild_home.html";
+}
     function goToMaster() {
       const loginId = sessionStorage.getItem("loginId");
       if (!loginId) {
