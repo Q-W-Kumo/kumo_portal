@@ -670,10 +670,8 @@ async function initializePage() {
 
     // ✅ 更新ボタンの動作を修正（新規追加）
     function goToBattleInputPage() {
-            console.log("🔍 更新ボタンが押されました！");
     const loginId = sessionStorage.getItem("loginId");
     const loginRole = sessionStorage.getItem("loginRole");
-            console.log("✅ ログイン情報:", { loginId, loginRole });
 
     if (!loginId || !loginRole) {
         alert("ログイン情報が取得できません。再度ログインしてください。");
@@ -686,11 +684,12 @@ async function initializePage() {
         console.error("⚠️ currentRound が未定義！", { currentRound });
         return;
     }
-            console.log("✅ 遷移準備完了: guild_battle_input.html へ遷移");
-            console.log("🔍 現在のログイン情報:", {
-            loginId: sessionStorage.getItem("loginId"),
-            loginRole: sessionStorage.getItem("loginRole"),
-            round: currentRound
+    // 🔍 デバッグログを追加
+    console.log("🔍 現在のログイン情報:", {
+        loginId: loginId,
+        loginRole: loginRole,
+        round: currentRound
+    });
       
     // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
     window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
