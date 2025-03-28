@@ -686,7 +686,7 @@ async function initializePage() {
     console.log("🟢 goToBattleInputPage() 呼び出し");
     console.log("🔍 取得した loginId:", loginId);
     console.log("🔍 取得した loginRole:", loginRole);
-    console.log("🔍 取得した currentRound:", currentRound);
+    console.log("🔍 取得した currentRound (関数内):", currentRound);
 
     if (!loginId || !loginRole) {
         alert("ログイン情報が取得できません。再度ログインしてください。");
@@ -696,7 +696,7 @@ async function initializePage() {
 
     if (!currentRound) {
         alert("開催中のギルドバトルが設定されていません。");
-        console.error("⚠️ currentRound が未定義！", { currentRound });
+        console.error("⚠️ currentRound の値が無効:", currentRound);
         return;
     }
     // 🔍 デバッグログを追加
