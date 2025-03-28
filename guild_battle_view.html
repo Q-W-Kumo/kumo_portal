@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>第○回ギルドバトル模擬戦結果一覧</title>
+
+  <!-- フォントとアイコン読み込み -->
+  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Gothic&family=Orbitron&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Sawarabi Gothic', 'Orbitron', sans-serif;
+      text-align: center;
+      background-color: #1a1a1a;
+      color: #fff;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      text-shadow: 0 0 4px rgba(255,255,255,0.4), 0 0 8px rgba(255,255,255,0.3);
+    }
+
+    h1, h2, h3, h4, h5, h6, .scroll-text, .menu-header, .menu-button, .digital-clock {
+      font-family: 'Sawarabi Gothic', 'Orbitron', sans-serif;
+      text-shadow: 0 0 4px rgba(255,255,255,0.4), 0 0 8px rgba(255,255,255,0.3);
+    }
+
+    .scroll-container {
+      width: 100%;
+      overflow: hidden;
+      background-color: #000;
+      padding: 10px 0;
+      margin-bottom: 10px;
+    }
+
+    .scroll-text {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollText 20s linear infinite;
+      font-family: 'DotGothic16', monospace;
+      font-size: 24px;
+      text-shadow: 0 0 10px #FFA500, 0 0 20px #FF4500;
+    }
+
+    .fixed-text { color: #FFA500; }
+
+    h2 {
+  　　font-size: 26px;
+  　　font-weight: bold;
+  　　text-shadow: 0 0 4px #fff, 0 0 8px #0ff, 0 0 12px #0ff;
+  　　margin-bottom: 20px;
+　　}
+
+    .variable-text { color: #FF3333; }
+
+    @keyframes scrollText {
+      0% { transform: translateX(100%); opacity: 0; }
+      5% { opacity: 1; }
+      95% { opacity: 1; }
+      100% { transform: translateX(-100%); opacity: 0; }
+    }
+
+    table {
+      width: 90%;
+      margin: auto;
+      border-collapse: collapse;
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+      position: relative;
+    }
+
+    th {
+      background-color: #333;
+    }
+
+    .search-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 2px 5px;
+      font-size: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .player-name { font-size: 16px; font-weight: bold; }
+    .player-info { font-size: 12px; color: #aaa; }
+
+    .gauge-wrapper { width: 120px; margin: auto; }
+    .gauge-container { position: relative; height: 12px; background-color: #555; border-radius: 5px; width: 100%; }
+    .gauge-bar { height: 100%; background-color: #4CAF50; border-radius: 5px 0 0 5px; }
+    .gauge-ticks { position: absolute; top: 0; left: 0; height: 100%; width: 100%; display: flex; justify-content: space-between; }
+    .gauge-ticks div { width: 1px; background-color: #aaa; }
+    .gauge-labels { display: flex; justify-content: space-between; font-size: 8px; color: #ccc; margin-top: 2px; }
+
+    .difficulty-label { font-size: 10px; margin-top: 4px; color: #ccc; }
+    .difficulty { display: flex; justify-content: center; margin-top: 2px; }
+    .difficulty span { font-size: 12px; margin: 0 1px; }
+    .difficulty .special { color: yellow; }
+    .difficulty .transparent { opacity: 0.3; }
+
+    .battle-times { display: flex; justify-content: center; gap: 4px; font-size: 16px; }
+
+    .update-button {
+      margin-top: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background-color: #2196F3;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .update-button:hover { background-color: #1976D2; }
+
+    .update-time { font-size: 10px; color: #ccc; margin-top: 4px; }
+
+    .challenge-header { background-color: #333; color: #FFA500; }
+
+    .challenge-btn {
+      width: 30px;
+      height: 30px;
+      margin: 2px;
+      background-color: #555;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .challenge-btn.active {
+      background-color: #fff;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .modal-content label, .modal-content select, .modal-content input {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
+    }
+
+    .modal-content button {
+      margin: 5px;
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .modal-content button.close-btn { background-color: #888; }
+    .modal-content button.reset-btn { background-color: #FF3333; }
+
+    /* サイドバー */
+    body {
+      display: flex;
+      margin: 0;
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    .sidebar {
+      width: 240px;
+      background-color: #2c2c2c;
+      height: 100vh;
+      padding: 20px 15px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .login-id-box {
+      border: 2px solid yellow;
+      background-color: #1a1a1a;
+      padding: 10px;
+      margin-bottom: 30px;
+      color: yellow;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      box-sizing: border-box;
+      border-radius: 5px;
+    }
+
+    .menu-header {
+      color: #fff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .menu-header i {
+      margin-right: 10px;
+    }
+
+    .menu-button {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      background-color: #2196F3;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      transition: background-color 0.3s;
+      text-decoration: none;
+    }
+
+    .menu-button i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .menu-button:hover {
+      background-color: #1976D2;
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 20px;
+      flex: 1;
+      box-sizing: border-box;
+    }
+
+    .digital-clock {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      color: #0ff;
+      text-align: center;
+      padding-top: 20px;
+      line-height: 1.6;
+      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+    }
+
+    .digital-clock .clock-time {
+      font-size: 22px;
+      font-weight: bold;
+      display: block;
+      text-shadow: 0 0 6px #0ff, 0 0 15px #0ff;
+    }
+
+    .digital-clock .clock-date {
+      font-size: 16px;
+      display: block;
+    }
+
+/* ▼▼▼ モバイル対応：スマホやタブレット向けのレイアウト調整 ▼▼▼ */
+@media (max-width: 768px) {
+
+  /* サイドバーを上に移動して横並びに */
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .login-id-box {
+    font-size: 12px;
+    margin-bottom: 10px;
+    width: auto;
+  }
+
+  .menu-button {
+    font-size: 14px;
+    padding: 10px 8px;
+    margin-bottom: 10px;
+    flex: none;
+    width: auto;
+  }
+
+  .main-content {
+    margin-left: 0;
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  .scroll-text {
+    font-size: 18px;
+  }
+
+  /* テーブルを横スクロール可能にする */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .player-name {
+    font-size: 14px;
+  }
+
+  .player-info {
+    font-size: 10px;
+  }
+
+  .gauge-wrapper {
+    width: 100px;
+  }
+
+  .battle-times {
+    font-size: 14px;
+  }
+
+  .update-button {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .digital-clock {
+    font-size: 14px;
+    padding-top: 10px;
+  }
+
+  .digital-clock .clock-time {
+    font-size: 18px;
+  }
+
+  .digital-clock .clock-date {
+    font-size: 14px;
+  }
+}
+
+/* ▲▲▲ モバイル対応ここまで ▲▲▲ */
+
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ▼ サイドバー -->
+  <div class="sidebar">
+    <div class="login-id-box" id="loginIdBox">ログインID: 取得中...</div>
+
+    <div class="menu-header"><i class="fas fa-bars"></i> メニュー</div>
+
+    <button class="menu-button" onclick="navigatePage('guild_home.html')">
+      <i class="fas fa-house"></i> ホーム
+    </button>
+
+    <button class="menu-button" onclick="navigatePage('guild_battle_input.html')">
+      <i class="fas fa-pen-to-square"></i> データ入力
+    </button>
+
+    <button class="menu-button" onclick="navigatePage('guild_master.html')">
+      <i class="fas fa-cogs"></i> マスタメンテナンス
+    </button>
+
+    <div id="datetimeDisplay" class="digital-clock"></div>
+
+  </div>
+
+  <!-- ▼ メインコンテンツ -->
+  <div class="main-content">
+    <!-- ✅ ここに完成ページのHTMLを挿入する -->
+
+  <h2 id="pageTitle">第○回ギルドバトル模擬戦結果一覧ページ</h2>
+
+  <div class="scroll-container">
+    <div class="scroll-text" id="scrollInfo"></div>
+  </div>
+
+  <div id="searchModal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle">STG検索</h3>
+      <label for="searchValue">パーセント</label>
+      <input type="number" id="searchValue" min="0" max="100">
+      <label for="searchCondition">条件</label>
+      <select id="searchCondition">
+        <option value="equal">＝</option>
+        <option value="greater">＞＝（以上）</option>
+        <option value="less">＜＝（以下）</option>
+      </select>
+      <button onclick="applySearch()">OK</button>
+      <button class="reset-btn" onclick="resetSearch()">リセット</button>
+      <button class="close-btn" onclick="closeModal()">閉じる</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th rowspan="2">メンバー</th>
+        <th rowspan="2">STG6
+          <button class="search-button" onclick="openModal('stg6')">検索</button>
+          <div class="difficulty-label">難易度</div>
+          <div class="difficulty">
+            <span class="special">💀</span><span>💀</span><span>💀</span><span>💀</span><span>💀</span><span>💀</span>
+          </div>
+        </th>
+        <th rowspan="2">STG5
+          <button class="search-button" onclick="openModal('stg5')">検索</button>
+          <div class="difficulty-label">難易度</div>
+          <div class="difficulty">
+            <span>💀</span><span>💀</span><span>💀</span><span>💀</span><span>💀</span><span class="transparent">💀</span>
+          </div>
+        </th>
+        <th rowspan="2">STG4
+          <button class="search-button" onclick="openModal('stg4')">検索</button>
+          <div class="difficulty-label">難易度</div>
+          <div class="difficulty">
+            <span>💀</span><span>💀</span><span>💀</span><span>💀</span><span class="transparent">💀</span><span class="transparent">💀</span>
+          </div>
+        </th>
+        <th rowspan="2">STG3
+          <button class="search-button" onclick="openModal('stg3')">検索</button>
+          <div class="difficulty-label">難易度</div>
+          <div class="difficulty">
+            <span>💀</span><span>💀</span><span>💀</span><span class="transparent">💀</span><span class="transparent">💀</span><span class="transparent">💀</span>
+          </div>
+        </th>
+        <th rowspan="2">STG2
+          <button class="search-button" onclick="openModal('stg2')">検索</button>
+          <div class="difficulty-label">難易度</div>
+          <div class="difficulty">
+            <span>💀</span><span>💀</span><span class="transparent">💀</span><span class="transparent">💀</span><span class="transparent">💀</span><span class="transparent">💀</span>
+          </div>
+        </th>
+        <th rowspan="2">STG1
+          <button class="search-button" onclick="openModal('stg1')">検索</button>
+          <div class="difficulty-label">難易度</div>
+          <div class="difficulty">
+            <span>💀</span><span class="transparent">💀</span><span class="transparent">💀</span><span class="transparent">💀</span><span class="transparent">💀</span><span class="transparent">💀</span>
+          </div>
+        </th>
+        <th rowspan="2">参加時間</th>
+        <th rowspan="2">更新時間</th>
+        <th rowspan="2">操作</th>
+        <th colspan="3" class="challenge-header">本戦挑戦状況</th>
+      </tr>
+      <tr>
+        <th>1日目</th>
+        <th>2日目</th>
+        <th>最終日</th>
+      </tr>
+    </thead>
+    <tbody id="memberTableBody"></tbody>
+  </table>
+
+  </div>
+
+  <script>
+    // ログインIDを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginId = urlParams.get('loginId') || '未取得';
+    document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
+
+    // ページ遷移時にloginIdを渡す
+   function navigatePage(page) {
+     if (page === 'guild_battle_input.html' && !(loginRole === 'GM' || loginRole === 'SM')) {
+       alert('このページへはアクセスできません（ギルマス・サブマス限定）');
+       return;
+     }
+     if (page === 'guild_master.html' && loginRole !== 'GM') {
+       alert('このページへはアクセスできません（ギルマス限定）');
+       return;
+     }
+     window.location.href = `${page}?loginId=${loginId}`;
+   }
+    // ✅ ここに完成ページのJSを挿入する
+
+    const guildMembers = JSON.parse(localStorage.getItem('guildMembers')) || [];
+    const loginMember = guildMembers.find(m => m.id === loginId);
+    const loginRole = loginMember?.role || 'member';
+    const battleRecords = JSON.parse(localStorage.getItem('guildBattleRecords')) || [];
+    const challengeStatus = JSON.parse(localStorage.getItem('challengeStatus')) || {};
+    const guildBattleSettings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
+
+    const scrollInfo = document.getElementById('scrollInfo');
+    const tableBody = document.getElementById('memberTableBody');
+    const searchModal = document.getElementById('searchModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const searchValueInput = document.getElementById('searchValue');
+    const searchConditionSelect = document.getElementById('searchCondition');
+
+    let searchTarget = '';
+    const ongoingBattle = guildBattleSettings.find(s => s.status === 'ongoing');
+
+    if (ongoingBattle) {
+      document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
+      if (ongoingBattle.bgImageUrl) {
+        document.body.style.backgroundImage = `url('${ongoingBattle.bgImageUrl}')`;
+      }
+      scrollInfo.innerHTML = `<span class="fixed-text">🟢 ギルドバトル情報 ➤ ボスエネミー:</span> <span class="variable-text">${ongoingBattle.enemyTarget}</span> <span class="fixed-text">｜ 弱点属性:</span> <span class="variable-text">${(ongoingBattle.attributes || []).join(' / ')}</span> <span class="fixed-text">｜ 弱点種別:</span> <span class="variable-text">${(ongoingBattle.type || []).join(' / ')}</span> <span class="fixed-text">🟢</span>`;
+    }
+
+    function openModal(target) {
+      searchTarget = target;
+      modalTitle.textContent = `${target.toUpperCase()} 検索`;
+      searchModal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      searchModal.style.display = 'none';
+    }
+
+    function applySearch() {
+      const value = Number(searchValueInput.value);
+      const condition = searchConditionSelect.value;
+
+      if (isNaN(value)) {
+        alert('パーセントを入力してください');
+        return;
+      }
+
+      const filteredMembers = guildMembers.filter(member => {
+        const record = battleRecords.find(r =>
+          r.id === member.id &&
+          ongoingBattle &&
+          r.round === Number(ongoingBattle.round.replace('第', '').replace('回', ''))
+        );
+        if (!record) return false;
+
+        const targetValue = Number(record[searchTarget]) || 0;
+        if (condition === 'equal') return targetValue === value;
+        if (condition === 'greater') return targetValue >= value;
+        if (condition === 'less') return targetValue <= value;
+        return false;
+      });
+
+      renderTable(filteredMembers);
+      closeModal();
+    }
+
+    function resetSearch() {
+      renderTable(guildMembers);
+      closeModal();
+    }
+
+    function toggleChallenge(memberId, day, slot) {
+      if (!challengeStatus[memberId]) challengeStatus[memberId] = {};
+      if (!challengeStatus[memberId][`day${day}`]) challengeStatus[memberId][`day${day}`] = {};
+      challengeStatus[memberId][`day${day}`][slot] = !challengeStatus[memberId][`day${day}`][slot];
+      localStorage.setItem('challengeStatus', JSON.stringify(challengeStatus));
+      renderTable(guildMembers);
+    }
+
+    function renderChallengeButtons(memberId, day) {
+      const buttons = [];
+      const slots = challengeStatus[memberId]?.[`day${day}`] || {};
+      for (let i = 1; i <= 3; i++) {
+        const active = slots[i];
+        buttons.push(`<button class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
+      }
+      return buttons.join('');
+    }
+
+    function renderTable(members = guildMembers) {
+      tableBody.innerHTML = '';
+      members.forEach(member => {
+        const row = document.createElement('tr');
+        const record = battleRecords.find(r => r.id === member.id && ongoingBattle && r.round === Number(ongoingBattle.round.replace('第', '').replace('回', '')));
+
+        const playerCell = document.createElement('td');
+        playerCell.innerHTML = `<div class="player-name">${member.name}</div><div class="player-info">Lv.${member.level} / 戦力 ${member.power}</div>`;
+        row.appendChild(playerCell);
+
+        const stages = record ? [record.stg6, record.stg5, record.stg4, record.stg3, record.stg2, record.stg1] : [0, 0, 0, 0, 0, 0];
+        stages.forEach(percent => {
+          const cell = document.createElement('td');
+          cell.innerHTML = `
+            ${percent}%
+            <div class="gauge-wrapper">
+              <div class="gauge-container">
+                <div class="gauge-bar" style="width: ${percent}%;"></div>
+                <div class="gauge-ticks"><div></div><div></div><div></div><div></div><div></div></div>
+              </div>
+              <div class="gauge-labels"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+            </div>`;
+          row.appendChild(cell);
+        });
+
+        const timeIcons = { "早朝": "🌅", "朝": "☀️", "昼": "🌞", "夜": "🌙", "深夜": "🌌" };
+        const timesCell = document.createElement('td');
+        timesCell.innerHTML = record?.times?.length ? `<div class="battle-times">${record.times.map(t => timeIcons[t] || '').join('')}</div>` : '-';
+        row.appendChild(timesCell);
+
+        const updateTimeCell = document.createElement('td');
+        updateTimeCell.innerHTML = `<div class="update-time">${record?.updatedAt || '-'}</div>`;
+        row.appendChild(updateTimeCell);
+
+const actionCell = document.createElement('td');
+if (member.id === loginId) {
+  const btn = document.createElement('button');
+  btn.className = 'update-button';
+  btn.textContent = '更新';
+  btn.onclick = () => window.location.href = `guild_battle_input.html?id=${member.id}&loginId=${loginId}`;
+  actionCell.appendChild(btn);
+} else {
+  actionCell.innerHTML = '-';
+}
+row.appendChild(actionCell);
+
+
+if (loginRole === 'GM' || loginRole === 'SM') {
+  for (let d = 1; d <= 3; d++) {
+    const td = document.createElement('td');
+    td.innerHTML = renderChallengeButtons(member.id, d);
+    row.appendChild(td);
+  }
+}
+        tableBody.appendChild(row);
+      });
+    }
+
+
+    renderTable();
+
+function updateDateTime() {
+  const datetimeDisplay = document.getElementById('datetimeDisplay');
+  const now = new Date();
+
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const dayIndex = now.getDay();
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mi = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+
+  let color = '';
+  if (dayIndex === 0) color = 'red';
+  else if (dayIndex === 6) color = 'blue';
+
+  const day = `<span style="color:${color}; font-weight:bold;">(${dayNames[dayIndex]})</span>`;
+  datetimeDisplay.innerHTML = `
+    <span class="clock-date">${yyyy}/${mm}/${dd} ${day}</span>
+    <span class="clock-time">${hh}:${mi}:${ss}</span>
+  `;
+}
+
+// 初回表示と1秒ごとの更新
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+  </script>
+
+</body>
+</html>
