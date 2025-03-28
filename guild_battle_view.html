@@ -697,22 +697,26 @@ async function initializePage() {
 
 if (!loginId || !loginRole) {
         alert("ログイン情報が取得できません。再度ログインしてください。");
-        console.error("⚠️ ログイン情報がないため、ホームに戻る処理を **停止** しました。");
-        return; // ✅ ホームへのリダイレクトを **無効化**
+    　  window.location.href = "guild_home.html";
+        return;
     }
 
-    if (!currentRound || currentRound === 0) {
+    if (!currentRound) {
         alert("開催中のギルドバトルが設定されていません。");
         console.error("⚠️ currentRound の値が無効:", currentRound);
-        return; // ✅ ホームに戻る処理を **停止**
+        return;
     }
+    // 🔍 デバッグログを追加
+    console.log("🔍 現在のログイン情報:", {
+        loginId: loginId,
+        loginRole: loginRole,
+        round: currentRound
+    });
 
-    // ✅ 遷移先のURLをログに出力（リダイレクトを止める）
-    const redirectUrl = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
-    console.log("✅ 遷移先:", redirectUrl);
-
-    // ⬇⬇⬇ リダイレクトを止めるため、以下をコメントアウト ⬇⬇⬇
-    // window.location.href = redirectUrl;
+    console.log("✅ 遷移先:", `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`);
+  
+    // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
+      window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
 }
 
 　　// 🔹 6️⃣ ページロード時にデータを取得
