@@ -615,12 +615,22 @@ async function initializePage() {
     // 1️⃣ 開催中のギルドバトルを取得
     ongoingBattle = await fetchOngoingBattle();  // ✅ グローバル変数に代入
     if (!ongoingBattle) return;
+　　　
+// 🔍 デバッグ用ログ（取得したバトル情報を確認）
+    console.log("✅ 取得したギルドバトル:", ongoingBattle);　　
+  
     currentRound = parseInt(ongoingBattle.round.replace('第', '').replace('回', ''), 10) || 0;
-    console.log("✅ 取得したギルドバトル:", ongoingBattle);
-    console.log("🔍 修正後の round:", currentRound);
-    console.log("✅ currentRound の値:", currentRound);
-    
-    // ページタイトル設定
+
+// 🔍 修正後の `currentRound` を確認
+    console.log("🔍 修正後の currentRound:", currentRound);
+
+    if (!currentRound) {
+        alert("開催中のギルドバトルが設定されていません。");
+        console.error("⚠️ `currentRound` が 0 または undefined です。取得データ:", ongoingBattle);
+        return;
+    }    
+
+// ページタイトル設定
     document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
 
     // **背景画像の設定**
