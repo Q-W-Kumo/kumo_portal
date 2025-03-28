@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ギルド管理ログイン</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -74,7 +82,6 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // IDを記憶していた場合の処理
       const savedUserId = localStorage.getItem("userId");
       if (savedUserId) {
         document.getElementById("userId").value = savedUserId;
@@ -82,7 +89,7 @@
       }
     });
 
-    function login() {
+    async function login() {
       const userId = document.getElementById("userId").value;
       const rememberMe = document.getElementById("rememberMe").checked;
 
@@ -91,28 +98,52 @@
         return;
       }
 
+      // 🔹 Supabase からユーザー情報を取得
+      let { data, error } = await db
+        .from("guild_members")
+        .select("id, role")
+        .eq("id", userId)
+        .single();
+
+      if (error || !data) {
+        alert("ユーザーが見つかりません");
+        return;
+      }
+
+      // ユーザー情報を sessionStorage に保存
+      sessionStorage.setItem("loginId", data.id);
+      sessionStorage.setItem("loginRole", data.role);
+
       if (rememberMe) {
         localStorage.setItem("userId", userId);
       } else {
         localStorage.removeItem("userId");
       }
 
-      alert("ログイン成功: " + userId);
-      // ログイン後のリダイレクト
-      window.location.href = "guild_home.html?loginId=" + encodeURIComponent(userId);
+      alert(`ログイン成功: ${data.id} (${data.role})`);
+      
+      // ✅ 役割に応じてリダイレクト
+      window.location.href = "guild_home.html";
     }
 
     function goToMaster() {
-      const userId = document.getElementById("userId").value;
-      if (!userId) {
-        alert("ユーザーIDを入力してください");
+      const loginId = sessionStorage.getItem("loginId");
+      if (!loginId) {
+        alert("ログインしてください");
         return;
       }
-      window.location.href = "guild_master.html?loginId=" + encodeURIComponent(userId);
+      const loginRole = sessionStorage.getItem("loginRole");
+      if (loginRole !== "GM") {
+        alert("ギルドマスターのみアクセス可能です");
+        return;
+      }
+      window.location.href = "guild_master.html";
     }
 
     function logout() {
       localStorage.removeItem("userId");
+      sessionStorage.removeItem("loginId");
+      sessionStorage.removeItem("loginRole");
       document.getElementById("userId").value = "";
       document.getElementById("rememberMe").checked = false;
       alert("ログアウトしました");
