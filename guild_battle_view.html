@@ -690,7 +690,7 @@ async function initializePage() {
 
     if (!loginId || !loginRole) {
         alert("ログイン情報が取得できません。再度ログインしてください。");
-        window.location.href = "guild_home.html";
+    //  window.location.href = "guild_home.html";
         return;
     }
 
@@ -709,7 +709,7 @@ async function initializePage() {
     console.log("✅ 遷移先:", `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`);
   
     // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
-    window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
+      window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
 }
 
 　　// 🔹 6️⃣ ページロード時にデータを取得
