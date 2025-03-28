@@ -744,14 +744,29 @@ async function initializePage() {
           row.appendChild(cell);
         });
 
-        const timeIcons = { "早朝": "🌅", "朝": "☀️", "昼": "🌞", "夜": "🌙", "深夜": "🌌" };
-        const timesCell = document.createElement('td');
-        timesCell.innerHTML = record?.times?.length ? `<div class="battle-times">${record.times.map(t => timeIcons[t] || '').join('')}</div>` : '-';
-        row.appendChild(timesCell);
+    const timeIcons = { "早朝": "🌅", "朝": "☀️", "昼": "🌞", "夜": "🌙", "深夜": "🌌" };
+    const timesCell = document.createElement('td');
 
-        const updateTimeCell = document.createElement('td');
-        updateTimeCell.innerHTML = `<div class="update-time">${record?.updatedAt || '-'}</div>`;
-        row.appendChild(updateTimeCell);
+    let timesArray = [];
+
+    if (record?.times) {
+        try {
+            timesArray = typeof record.times === "string" ? JSON.parse(record.times) : record.times;
+        } catch (e) {
+            console.error("times のパースエラー:", e);
+            timesArray = [];
+        }
+    }
+
+timesCell.innerHTML = timesArray.length 
+    ? `<div class="battle-times">${timesArray.map(t => timeIcons[t] || '').join('')}</div>` 
+    : '-';
+
+row.appendChild(timesCell);
+
+const updateTimeCell = document.createElement('td');
+updateTimeCell.innerHTML = `<div class="update-time">${record?.updated_at || '-'}</div>`;
+row.appendChild(updateTimeCell);
 
 const actionCell = document.createElement('td');
 if (member.id === loginId) {
