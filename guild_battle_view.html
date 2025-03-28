@@ -8,7 +8,7 @@
   <script>
     const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
 <title>第○回ギルドバトル模擬戦結果一覧</title>
@@ -524,12 +524,12 @@
    }
     // ✅ ここに完成ページのJSを挿入する
 
-    const guildMembers = JSON.parse(localStorage.getItem('guildMembers')) || [];
+    let guildMembers = [];
     const loginMember = guildMembers.find(m => m.id === loginId);
     const loginRole = loginMember?.role || 'member';
-    const battleRecords = JSON.parse(localStorage.getItem('guildBattleRecords')) || [];
+    let battleRecords = [];
     const challengeStatus = JSON.parse(localStorage.getItem('challengeStatus')) || {};
-    const guildBattleSettings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
+    let currentRound = 0;
 
     const scrollInfo = document.getElementById('scrollInfo');
     const tableBody = document.getElementById('memberTableBody');
@@ -539,15 +539,102 @@
     const searchConditionSelect = document.getElementById('searchCondition');
 
     let searchTarget = '';
-    const ongoingBattle = guildBattleSettings.find(s => s.status === 'ongoing');
+    
+// 🔹 1️⃣ ギルドバトルの開催情報を取得
+async function fetchOngoingBattle() {
+    const { data, error } = await db
+        .from('guild_battle_settings')
+        .select('*')
+        .eq('status', 'ongoing')
+        .single();
 
-    if (ongoingBattle) {
-      document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
-      if (ongoingBattle.bgImageUrl) {
+    if (error || !data) {
+        alert('開催中のギルドバトルがありません');
+        window.location.href = 'index.html';
+        return null;
+    }
+    return data;
+}
+
+// 🔹 2️⃣ ギルドメンバー情報を取得
+async function fetchGuildMembers() {
+    const { data, error } = await db
+        .from('guild_members')
+        .select('*');
+
+    if (error) {
+        console.error('メンバー取得エラー:', error);
+        return [];
+    }
+    return data;
+}
+
+// 🔹 3️⃣ バトル結果を取得
+async function fetchBattleRecords(round) {
+    const { data, error } = await db
+        .from('guild_battle_records')
+        .select('*')
+        .eq('round', round);
+
+    if (error) {
+        console.error('バトル結果取得エラー:', error);
+        return [];
+    }
+    return data;
+}
+
+// 🔹 4️⃣ 挑戦状況を取得
+async function fetchChallengeStatus() {
+    const { data, error } = await db
+        .from('challenge_status')
+        .select('*');
+
+    if (error) {
+        console.error('挑戦状況取得エラー:', error);
+        return {};
+    }
+
+    let status = {};
+    data.forEach(row => {
+        status[row.member_id] = {
+            day1: row.day1 || [],
+            day2: row.day2 || [],
+            day3: row.day3 || []
+        };
+    });
+
+    return status;
+}
+
+// 🔹 5️⃣ ページ初期化処理
+async function initializePage() {
+    // ギルドバトル設定取得
+    const ongoingBattle = await fetchOngoingBattle();
+    if (!ongoingBattle) return;
+
+    currentRound = ongoingBattle.round;
+
+    // ページタイトル設定
+    document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
+
+    // 背景画像設定
+    if (ongoingBattle.bgImageUrl) {
         document.body.style.backgroundImage = `url('${ongoingBattle.bgImageUrl}')`;
-      }
+    }
+
       scrollInfo.innerHTML = `<span class="fixed-text">🟢 ギルドバトル情報 ➤ ボスエネミー:</span> <span class="variable-text">${ongoingBattle.enemyTarget}</span> <span class="fixed-text">｜ 弱点属性:</span> <span class="variable-text">${(ongoingBattle.attributes || []).join(' / ')}</span> <span class="fixed-text">｜ 弱点種別:</span> <span class="variable-text">${(ongoingBattle.type || []).join(' / ')}</span> <span class="fixed-text">🟢</span>`;
     }
+
+    // メンバーとバトル結果、挑戦状況の取得
+    guildMembers = await fetchGuildMembers();  // 🔹 Supabaseから取得
+    battleRecords = await fetchBattleRecords(currentRound);
+    challengeStatus = await fetchChallengeStatus();
+
+    renderTable();
+}
+
+// 🔹 6️⃣ ページロード時にデータを取得
+window.onload = initializePage;
 
     function openModal(target) {
       searchTarget = target;
