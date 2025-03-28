@@ -667,6 +667,26 @@ async function initializePage() {
     renderTable();
 }
 
+    // ✅ 更新ボタンの動作を修正（新規追加）
+    function goToBattleInputPage() {
+    const loginId = sessionStorage.getItem("loginId");
+    const loginRole = sessionStorage.getItem("loginRole");
+
+    if (!loginId || !loginRole) {
+        alert("ログイン情報が取得できません。再度ログインしてください。");
+        window.location.href = "guild_home.html";
+        return;
+    }
+
+    if (!currentRound) {
+        alert("開催中のギルドバトルが設定されていません。");
+        return;
+    }
+
+    // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
+    window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
+}
+
 　　// 🔹 6️⃣ ページロード時にデータを取得
 　　window.onload = initializePage;
 
@@ -784,7 +804,7 @@ if (member.id === loginId) {
   const btn = document.createElement('button');
   btn.className = 'update-button';
   btn.textContent = '更新';
-  btn.onclick = () => window.location.href = `guild_battle_input.html?id=${member.id}&loginId=${loginId}`;
+  btn.onclick = goToBattleInputPage;  // ✅ ここを修正
   actionCell.appendChild(btn);
 } else {
   actionCell.innerHTML = '-';
