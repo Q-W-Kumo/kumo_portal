@@ -615,6 +615,13 @@ async function initializePage() {
     // 1️⃣ 開催中のギルドバトルを取得
     ongoingBattle = await fetchOngoingBattle();  // ✅ グローバル変数に代入
     if (!ongoingBattle) return;
+
+    // **タブタイトルの更新**
+    document.title = `${ongoingBattle.round} ギルドバトル模擬戦結果一覧`;
+    console.log("✅ 更新後のタイトル:", document.title);
+
+    console.log("✅ 取得したギルドバトル:", ongoingBattle);
+    console.log("🔍 取得した round:", ongoingBattle?.round);
 　　　
 // 🔍 デバッグ用ログ（取得したバトル情報を確認）
     console.log("✅ 取得したギルドバトル:", ongoingBattle);　　
