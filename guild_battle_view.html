@@ -622,11 +622,15 @@ async function initializePage() {
     // ページタイトル設定
     document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
 
-    // 背景画像設定
-    if (ongoingBattle.bgImageUrl) {
-        document.body.style.backgroundImage = `url('${ongoingBattle.bgImageUrl}')`;
-    }
-    // 2️⃣ メンバー情報・バトル記録・挑戦状況を取得
+    // **背景画像の設定**
+    if (ongoingBattle.bg_image_url) { // 🔹 プロパティ名を確認
+        document.body.style.backgroundImage = `url('${ongoingBattle.bg_image_url}')`;
+        console.log("✅ 背景画像が設定されました:", ongoingBattle.bg_image_url);
+    } else {
+        console.warn("⚠️ 背景画像がありません");
+    } 
+  
+ // 2️⃣ メンバー情報・バトル記録・挑戦状況を取得
     guildMembers = await fetchGuildMembers();
     battleRecords = await fetchBattleRecords(currentRound);
     challengeStatus = await fetchChallengeStatus();
@@ -644,13 +648,21 @@ async function initializePage() {
         return;
     }
 
-    // 3️⃣ スクロール情報を設定
+    // **スクロールバーの情報を更新**
+    let enemyTarget = ongoingBattle.enemy_target || "???";
+    let attributes = Array.isArray(ongoingBattle.attributes) ? ongoingBattle.attributes.join(' / ') : "不明";
+    let type = Array.isArray(ongoingBattle.type) ? ongoingBattle.type.join(' / ') : "不明";
+
     scrollInfo.innerHTML = `<span class="fixed-text">🟢 ギルドバトル情報 ➤ ボスエネミー:</span> 
-    <span class="variable-text">${ongoingBattle.enemyTarget}</span> 
-    <span class="fixed-text">｜ 弱点属性:</span> <span class="variable-text">${(ongoingBattle.attributes || []).join(' / ')}</span> 
-    <span class="fixed-text">｜ 弱点種別:</span> <span class="variable-text">${(ongoingBattle.type || []).join(' / ')}</span> 
+    <span class="variable-text">${enemyTarget}</span> 
+    <span class="fixed-text">｜ 弱点属性:</span> 
+    <span class="variable-text">${attributes}</span> 
+    <span class="fixed-text">｜ 弱点種別:</span> 
+    <span class="variable-text">${type}</span> 
     <span class="fixed-text">🟢</span>`;
 
+    console.log("✅ スクロールバー情報:", scrollInfo.innerHTML);
+  
     // 4️⃣ テーブルを描画
     renderTable();
 }
