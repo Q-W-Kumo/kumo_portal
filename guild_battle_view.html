@@ -548,10 +548,12 @@ async function fetchOngoingBattle() {
         .single();
 
     if (error || !data) {
+        console.error("ギルドバトル取得エラー:", error);
         alert('開催中のギルドバトルがありません');
-        window.location.href = 'index.html';
         return null;
     }
+    
+    console.log("取得したギルドバトル:", data); // ✅ デバッグログ
     return data;
 }
 
@@ -610,9 +612,12 @@ async function fetchChallengeStatus() {
 async function initializePage() {
     // 1️⃣ 開催中のギルドバトルを取得
     const ongoingBattle = await fetchOngoingBattle();
-    if (!ongoingBattle) return;
+    if (!ongoingBattle || !ongoingBattle.round) {
+        console.error("開催中のギルドバトルが取得できませんでした。");
+        return;
+    }
 
-    currentRound = parseInt(ongoingBattle.round, 10); // ✅ 数値として扱う
+    currentRound = Number(ongoingBattle.round) || 0; // ✅ 数値として扱う
 
     // ページタイトル設定
     document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
