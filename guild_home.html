@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script>
     const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwi...";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
@@ -31,9 +31,7 @@
       width: 300px;
       text-align: center;
     }
-    h2 {
-      margin-bottom: 15px;
-    }
+    h2 { margin-bottom: 15px; }
     input[type="text"] {
       width: 100%;
       padding: 8px;
@@ -41,9 +39,7 @@
       border-radius: 4px;
       border: none;
     }
-    label {
-      font-size: 14px;
-    }
+    label { font-size: 14px; }
     .button {
       width: 100%;
       padding: 10px;
@@ -53,18 +49,9 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .login-btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-    .master-btn {
-      background-color: #2196F3;
-      color: white;
-    }
-    .logout-btn {
-      background-color: #d32f2f;
-      color: white;
-    }
+    .login-btn { background-color: #4CAF50; color: white; }
+    .master-btn { background-color: #2196F3; color: white; }
+    .logout-btn { background-color: #d32f2f; color: white; }
   </style>
 </head>
 <body>
@@ -89,72 +76,71 @@
       }
     });
 
-async function login() {
-    const userId = document.getElementById("userId").value;
-    const rememberMe = document.getElementById("rememberMe").checked;
+    async function login() {
+      const userId = document.getElementById("userId").value;
+      const rememberMe = document.getElementById("rememberMe").checked;
 
-    if (!userId) {
+      if (!userId) {
         alert("ユーザーIDを入力してください");
         return;
-    }
+      }
 
-    console.log("🔍 入力されたユーザーID:", userId);
+      console.log("🔍 入力されたユーザーID:", userId);
 
-    let { data, error } = await db
-        .from("guild_members")
-        .select("id, role")
-        .eq("id", userId)
-        .single();
+      let { data, error } = await db
+          .from("guild_members")
+          .select("id, role")
+          .eq("id", userId)
+          .single();
 
-    console.log("🛠️ Supabase からのレスポンス:", data, error);
+      console.log("🛠️ Supabase からのレスポンス:", data, error);
 
-    if (error || !data) {
+      if (error || !data) {
         alert("ユーザーが見つかりません");
         return;
-    }
+      }
 
-    sessionStorage.setItem("loginId", data.id);
-    sessionStorage.setItem("loginRole", data.role);
+      // ✅ sessionStorage → localStorage に変更
+      localStorage.setItem("loginId", data.id);
+      localStorage.setItem("loginRole", data.role);
 
-    console.log("✅ セッションに保存されたデータ:", {
-        loginId: sessionStorage.getItem("loginId"),
-        loginRole: sessionStorage.getItem("loginRole"),
-    });
+      console.log("✅ ログイン情報を保存:", {
+        loginId: localStorage.getItem("loginId"),
+        loginRole: localStorage.getItem("loginRole"),
+      });
 
-    if (rememberMe) {
+      if (rememberMe) {
         localStorage.setItem("userId", userId);
-    } else {
+      } else {
         localStorage.removeItem("userId");
+      }
+
+      alert(`ログイン成功: ${data.id} (${data.role})`);
+
+      console.log("🔄 ページ遷移を実行: guild_battle_view.html");
+
+      // ✅ setTimeout() 削除 → 直接遷移
+      window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(userId)}`;
     }
 
-    alert(`ログイン成功: ${data.id} (${data.role})`);
-
-    console.log("🔄 ページ遷移を実行: guild_battle_view.html");
-
-    // ✅ 遅延を入れて試す（ポップアップブロック回避）
-    setTimeout(() => {
-        window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(userId)}`;
-    }, 500);
-}    
-    
     function goToMaster() {
-      const loginId = sessionStorage.getItem("loginId");
+      const loginId = localStorage.getItem("loginId");
       if (!loginId) {
         alert("ログインしてください");
         return;
       }
-      const loginRole = sessionStorage.getItem("loginRole");
+      const loginRole = localStorage.getItem("loginRole");
       if (loginRole !== "GM") {
         alert("ギルドマスターのみアクセス可能です");
         return;
       }
-      window.location.href = "guild_master.html";
+      window.location.href = `guild_master.html?loginId=${encodeURIComponent(loginId)}`;
     }
 
     function logout() {
       localStorage.removeItem("userId");
-      sessionStorage.removeItem("loginId");
-      sessionStorage.removeItem("loginRole");
+      localStorage.removeItem("loginId");
+      localStorage.removeItem("loginRole");
       document.getElementById("userId").value = "";
       document.getElementById("rememberMe").checked = false;
       alert("ログアウトしました");
