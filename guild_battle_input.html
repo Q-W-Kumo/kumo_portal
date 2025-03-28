@@ -318,6 +318,8 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const loginId = urlParams.get('loginId') || '未取得';
+    const loginRole = urlParams.get("role") || 'member';
+    const currentRound = parseInt(urlParams.get("round"), 10) || 0;
     document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
 
 function navigatePage(page) {
@@ -336,9 +338,20 @@ function navigatePage(page) {
       return urlParams.get(param);
     }
 
-    function loadGuildMembers() {
-      return JSON.parse(localStorage.getItem('guildMembers')) || [];
-    }
+    async function fetchGuildMember() {
+  const { data, error } = await db
+    .from("guild_members")
+    .select("*")
+    .eq("id", loginId)
+    .single();
+
+  if (error || !data) {
+    console.error("❌ プレイヤー情報取得エラー:", error);
+    alert("プレイヤー情報を取得できませんでした。");
+    return null;
+  }
+  return data;
+}
 
 async function loadBattleRecords() {
   const { data, error } = await db
@@ -481,31 +494,54 @@ async function saveBattleData() {
 
 let loginRole = 'member';
 
-function initializePage() {
-  const guildBattleSettings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
-  const ongoingBattle = guildBattleSettings.find(s => s.status === 'ongoing');
+async function initializePage() {
+  console.log("🟢 initializePage() 実行開始");
+  console.log("🔍 loginId:", loginId);
+  console.log("🔍 loginRole:", loginRole);
+  console.log("🔍 currentRound:", currentRound);
 
-  if (!ongoingBattle) {
-    alert('開催中のギルドバトルが設定されていません。');
-    window.location.href = 'index.html';
+  if (!loginId || !loginRole) {
+    alert("ログイン情報が取得できません。再度ログインしてください。");
+    window.location.href = "guild_home.html";
     return;
   }
 
-currentRound = parseInt(ongoingBattle.round.replace('第', '').replace('回', ''));
+  // 🔹 Supabaseから開催中のギルドバトル情報を取得
+  const { data: ongoingBattle, error } = await db
+    .from("guild_battle_settings")
+    .select("*")
+    .eq("status", "ongoing")
+    .single();
 
-const guildMembers = loadGuildMembers();
-const loginMember = guildMembers.find(m => m.id === loginId);
-loginRole = loginMember?.role || 'member';  // ← ここ、let をつけない！既にグローバルで定義済み
+  if (error || !ongoingBattle) {
+    console.error("❌ 開催中のギルドバトルが取得できません:", error);
+    alert("開催中のギルドバトルが設定されていません。");
+    return;
+  }
 
-document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル 模擬戦結果入力ページ`;
+  console.log("✅ 取得したギルドバトル:", ongoingBattle);
 
-loadGuildMembersTable();
-const urlId = getUrlParam('id');
-if (urlId) selectMember(urlId);
+  // 🔹 バトル回数を取得
+  currentRound = parseInt(ongoingBattle.round.replace("第", "").replace("回", ""), 10);
+  console.log("🔍 修正後の currentRound:", currentRound);
+
+  // 🔹 ページタイトルを更新
+  document.getElementById("pageTitle").textContent = `${ongoingBattle.round} ギルドバトル 模擬戦結果入力ページ`;
+
+  // 🔹 ギルドメンバー情報を Supabase から取得
+  const guildMembers = await fetchGuildMembers();
+  const loginMember = guildMembers.find(m => m.id === loginId);
+  loginRole = loginMember?.role || "member"; // ← 既にグローバルで定義済みなので `let` は不要
+
+  // 🔹 ギルドメンバー一覧のテーブルを読み込む
+  loadGuildMembersTable();
+
+  // 🔹 URL から ID が渡されている場合、該当メンバーを選択
+  const urlId = getUrlParam("id");
+  if (urlId) selectMember(urlId);
 }
 
-window.onload = initializePage;
-    
+window.onload = initializePage;    
 </script>
 
 </body>
