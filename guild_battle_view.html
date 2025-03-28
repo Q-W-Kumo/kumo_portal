@@ -710,15 +710,18 @@ async function initializePage() {
     }
 
     function renderChallengeButtons(memberId, day) {
-      const buttons = [];
-      const slots = challengeStatus[memberId]?.[`day${day}`] || {};
-      for (let i = 1; i <= 3; i++) {
-        const active = slots[i];
-        buttons.push(`<button class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
-      }
-      return buttons.join('');
-    }
+        const buttons = [];
+        const slots = challengeStatus[memberId]?.[`day${day}`] || {};
 
+        for (let i = 1; i <= 3; i++) {
+            const slotKey = `slot${i}`;
+            const active = slots[slotKey] === true; // 🔹 JSON内のキーを明示的に指定
+
+            buttons.push(`<button class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
+        }
+        return buttons.join('');
+    }    
+    
     function renderTable(members = guildMembers) {
       tableBody.innerHTML = '';
       members.forEach(member => {
@@ -747,21 +750,17 @@ async function initializePage() {
     const timeIcons = { "早朝": "🌅", "朝": "☀️", "昼": "🌞", "夜": "🌙", "深夜": "🌌" };
     const timesCell = document.createElement('td');
 
-    let timesArray = [];
+// `record.times` をJSONとして解析
+let battleTimes = [];
+try {
+    battleTimes = record?.times ? JSON.parse(record.times) : [];
+} catch (e) {
+    console.error("❌ 参加時間の解析エラー:", e);
+}
 
-    if (record?.times) {
-        try {
-            timesArray = typeof record.times === "string" ? JSON.parse(record.times) : record.times;
-        } catch (e) {
-            console.error("times のパースエラー:", e);
-            timesArray = [];
-        }
-    }
-
-timesCell.innerHTML = timesArray.length 
-    ? `<div class="battle-times">${timesArray.map(t => timeIcons[t] || '').join('')}</div>` 
+timesCell.innerHTML = battleTimes.length
+    ? `<div class="battle-times">${battleTimes.map(t => timeIcons[t] || '❓').join('')}</div>`
     : '-';
-
 row.appendChild(timesCell);
 
 const updateTimeCell = document.createElement('td');
