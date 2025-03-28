@@ -98,12 +98,15 @@
         return;
       }
 
-      // 🔹 Supabase からユーザー情報を取得
+      console.log("🔍 入力されたユーザーID:", userId);
+
       let { data, error } = await db
         .from("guild_members")
         .select("id, role")
         .eq("id", userId)
         .single();
+
+      console.log("🛠️ Supabase からのレスポンス:", data, error);
 
       if (error || !data) {
         alert("ユーザーが見つかりません");
@@ -121,9 +124,13 @@
       }
 
       alert(`ログイン成功: ${data.id} (${data.role})`);
+
+      console.log("🔄 ページ遷移を実行: guild_battle_view.html");
       
-      // ✅ 役割に応じてリダイレクト
-      window.location.href = "guild_home.html";
+      // ✅ ここでログイン情報を渡して guild_battle_view.html に遷移
+      setTimeout(() => {
+        window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(data.id)}&role=${encodeURIComponent(data.role)}`;
+      }, 500);
     }
 
     function goToMaster() {
