@@ -525,11 +525,10 @@
     // ✅ ここに完成ページのJSを挿入する
 
     let guildMembers = [];
-    const loginMember = guildMembers.find(m => m.id === loginId);
-    const loginRole = loginMember?.role || 'member';
     let battleRecords = [];
-    const challengeStatus = JSON.parse(localStorage.getItem('challengeStatus')) || {};
+    let challengeStatus = {};
     let currentRound = 0;
+    let loginRole = "member"; // 初期値を設定
 
     const scrollInfo = document.getElementById('scrollInfo');
     const tableBody = document.getElementById('memberTableBody');
@@ -571,10 +570,11 @@ async function fetchGuildMembers() {
 
 // 🔹 3️⃣ バトル結果を取得
 async function fetchBattleRecords(round) {
+    console.log(`🔍 Fetching battle records for round: ${round}`);
     const { data, error } = await db
         .from('guild_battle_records')
         .select('*')
-        .eq('round', round);
+        .eq('round', round);  // 👈 roundを文字列ではなく数値として検索
 
     if (error) {
         console.error('バトル結果取得エラー:', error);
@@ -608,17 +608,11 @@ async function fetchChallengeStatus() {
 
 // 🔹 5️⃣ ページ初期化処理
 async function initializePage() {
-  console.log("initializePage() 開始");  
-  
-  // ギルドバトル設定取得
+    // 1️⃣ 開催中のギルドバトルを取得
     const ongoingBattle = await fetchOngoingBattle();
-    if (!ongoingBattle) {
-        console.error("開催中のギルドバトルが取得できません");
-        return;
-    }
+    if (!ongoingBattle) return;
 
-    currentRound = ongoingBattle.round;
-    console.log(`現在のギルドバトル回数: ${currentRound}`);
+    currentRound = parseInt(ongoingBattle.round, 10); // ✅ 数値として扱う
 
     // ページタイトル設定
     document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
@@ -627,16 +621,20 @@ async function initializePage() {
     if (ongoingBattle.bgImageUrl) {
         document.body.style.backgroundImage = `url('${ongoingBattle.bgImageUrl}')`;
     }
-    // メンバーとバトル結果、挑戦状況の取得
-    guildMembers = await fetchGuildMembers();  // 🔹 Supabaseから取得
+    // 2️⃣ メンバー情報・バトル記録・挑戦状況を取得
+    guildMembers = await fetchGuildMembers();
     battleRecords = await fetchBattleRecords(currentRound);
     challengeStatus = await fetchChallengeStatus();
 
-        console.log("ギルドメンバー:", guildMembers);
+    // 3️⃣ ログインユーザーの役割を設定（ここで行う）
+    const loginMember = guildMembers.find(m => m.id === loginId);
+    loginRole = loginMember?.role || 'member';
+
+    console.log("ギルドメンバー:", guildMembers);
     console.log("バトル記録:", battleRecords);
     console.log("挑戦状況:", challengeStatus);
-
-    if (!guildMembers.length || !battleRecords.length) {
+  
+ 　 if (!guildMembers.length || !battleRecords.length) {
         console.warn("データが取得できませんでした");
         return;
     }
@@ -652,8 +650,8 @@ async function initializePage() {
     renderTable();
 }
 
-// 🔹 6️⃣ ページロード時にデータを取得
-window.onload = initializePage;
+　　// 🔹 6️⃣ ページロード時にデータを取得
+　　window.onload = initializePage;
 
     function openModal(target) {
       searchTarget = target;
