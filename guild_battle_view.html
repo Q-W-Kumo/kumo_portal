@@ -683,9 +683,14 @@ async function initializePage() {
 
     if (!currentRound) {
         alert("開催中のギルドバトルが設定されていません。");
+        console.error("⚠️ currentRound が未定義！", { currentRound });
         return;
     }
             console.log("✅ 遷移準備完了: guild_battle_input.html へ遷移");
+            console.log("🔍 現在のログイン情報:", {
+            loginId: sessionStorage.getItem("loginId"),
+            loginRole: sessionStorage.getItem("loginRole"),
+            round: currentRound
       
     // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
     window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
