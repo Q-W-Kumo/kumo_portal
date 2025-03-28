@@ -24,74 +24,6 @@
       background-color: #1a1a1a;
       color: #fff;
     }
-
-    /* サイドバー */
-    .sidebar {
-      width: 240px;
-      background-color: #2c2c2c;
-      height: 100vh;
-      padding: 20px 15px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      position: fixed;
-      left: 0;
-      top: 0;
-    }
-
-    .login-id-box {
-      border: 2px solid yellow;
-      background-color: #1a1a1a;
-      padding: 10px;
-      margin-bottom: 30px;
-      color: yellow;
-      width: 100%;
-      text-align: center;
-      font-size: 14px;
-      box-sizing: border-box;
-      border-radius: 5px;
-    }
-
-    .menu-header {
-      color: #fff;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-    .menu-header i {
-      margin-right: 10px;
-    }
-
-    .menu-button {
-      width: 100%;
-      padding: 12px 15px;
-      margin-bottom: 15px;
-      background-color: #2196F3;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      font-size: 15px;
-      transition: background-color 0.3s;
-      text-decoration: none;
-    }
-
-    .menu-button i {
-      margin-right: 10px;
-      font-size: 18px;
-    }
-
-    .menu-button:hover {
-      background-color: #1976D2;
-    }
-
-    /* メインコンテンツ */
     .main-content {
       margin-left: 240px;
       padding: 20px;
@@ -99,172 +31,20 @@
       box-sizing: border-box;
       text-align: center;
     }
-
-    h2, h3 {
-      margin-bottom: 20px;
-    }
-
-    /* 入力フォーム */
-    .container {
-      background-color: #333;
-      padding: 20px;
-      border-radius: 10px;
-      width: 600px;
-      margin: 30px auto;
-      display: grid;
-      gap: 10px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-    }
-
-    label {
-      display: block;
-      font-size: 12px;
-      text-align: left;
-      margin-bottom: 4px;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 8px;
-      border-radius: 5px;
-      border: none;
-      box-sizing: border-box;
-      background-color: #555;
-      color: #fff;
-    }
-
-    input.readonly-field {
-      background-color: transparent;
-      font-weight: bold;
-      color: #fff;
-      border: none;
-    }
-
-    .checkbox-group-container {
-      border: 1px solid #888;
-      border-radius: 5px;
-      padding: 10px;
-    }
-
-    .checkbox-title {
-      text-align: left;
-      font-size: 14px;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
-    .checkbox-group {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-    }
-
-    .checkbox-group label {
-      font-size: 12px;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    button:hover {
-      background-color: #43A047;
-    }
-
-    /* サブフォームテーブル */
-    .subform-table {
-      width: 80%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background-color: rgba(51, 51, 51, 0.9);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .subform-table th,
-    .subform-table td {
-      border: 1px solid #444;
-      padding: 12px 8px;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .subform-table th {
-      background-color: #4CAF50;
-      color: #fff;
-    }
-
-    .subform-table td {
-      background-color: #2c2c2c;
-    }
-
-    .select-btn {
-      padding: 6px 12px;
-      font-size: 12px;
-      background-color: #2196F3;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .select-btn:hover {
-      background-color: #1976D2;
-    }
   </style>
 </head>
 
 <body>
 
-  <!-- サイドバー -->
-  <div class="sidebar">
-    <div class="login-id-box" id="loginIdBox">ログインID: 取得中...</div>
-
-    <div class="menu-header"><i class="fas fa-bars"></i>メニュー</div>
-
-    <button class="menu-button" onclick="navigatePage('guild_home.html')">
-      <i class="fas fa-house"></i> ホーム
-    </button>
-    <button class="menu-button" onclick="navigatePage('guild_battle_view.html')">
-      <i class="fas fa-database"></i> データビュー
-    </button>
-    <button class="menu-button" onclick="navigatePage('guild_master.html')">
-      <i class="fas fa-cogs"></i> マスタメンテナンス
-    </button>
-  </div>
-
-  <!-- メインコンテンツ -->
   <div class="main-content">
     <h2 id="pageTitle">ギルドバトル 模擬戦結果入力ページ</h2>
 
     <div class="container">
       <!-- プレイヤー情報 -->
       <div class="row">
-        <div>
-          <label>プレイヤー名</label>
-          <input type="text" id="playerName" class="readonly-field" readonly>
-        </div>
-        <div>
-          <label>プレイヤーレベル</label>
-          <input type="text" id="playerLevel" class="readonly-field" readonly>
-        </div>
-        <div>
-          <label>最高戦力値</label>
-          <input type="text" id="playerPower" class="readonly-field" readonly>
-        </div>
+        <div><label>プレイヤー名</label><input type="text" id="playerName" class="readonly-field" readonly></div>
+        <div><label>プレイヤーレベル</label><input type="text" id="playerLevel" class="readonly-field" readonly></div>
+        <div><label>最高戦力値</label><input type="text" id="playerPower" class="readonly-field" readonly></div>
       </div>
 
       <!-- STG1〜STG6 -->
@@ -294,219 +74,85 @@
       <button onclick="saveBattleData()">データを保存</button>
     </div>
 
-    <h3>ギルドメンバー一覧（サブフォーム）</h3>
-
-    <table class="subform-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>団員名</th>
-          <th>レベル</th>
-          <th>戦力</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody id="memberTableBody"></tbody>
-    </table>
-
-    <!-- hidden field for storing selected ID -->
-    <input type="hidden" id="playerId">
-
-  </div>
-
-  <!-- 共通スクリプト -->
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const loginId = urlParams.get('loginId') || '未取得';
-    document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
-
-function navigatePage(page) {
-  if (page === 'guild_master.html' && loginRole !== 'GM') {
-    alert('このページへはアクセスできません（ギルマス限定）');
-    return;
-  }
-  window.location.href = `${page}?loginId=${loginId}`;
-}
-
-    // メイン機能スクリプト
-    let currentRound = 0;
-
-    function getUrlParam(param) {
+    <script>
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
+      const loginId = urlParams.get("loginId");
+      const loginRole = urlParams.get("role");
+      let currentRound = parseInt(urlParams.get("round"), 10) || 0;
 
-    function loadGuildMembers() {
-      return JSON.parse(localStorage.getItem('guildMembers')) || [];
-    }
+      async function initializePage() {
+        console.log("🟢 initializePage() 実行開始");
+        console.log("🔍 loginId:", loginId);
+        console.log("🔍 loginRole:", loginRole);
+        console.log("🔍 currentRound:", currentRound);
 
-async function loadBattleRecords() {
-  const { data, error } = await db
-    
-    .from('guild_battle_records')
-    .select('*')
-    .eq('round', currentRound);
+        if (!loginId || !loginRole) {
+          alert("ログイン情報が取得できません。再度ログインしてください。");
+          window.location.href = "guild_home.html";
+          return;
+        }
 
-  if (error) {
-    console.error('データ取得失敗:', error);
-    return [];
-  }
-  return data;
-}
-function loadGuildMembersTable() {
-  // 役割が GM または SM でない場合は非表示
-  if (loginRole !== 'GM' && loginRole !== 'SM') {
-    document.querySelector('.subform-table').style.display = 'none'; // 表自体を非表示
-    return;
-  }
+        if (!currentRound) {
+          alert("開催中のギルドバトルが設定されていません。");
+          return;
+        }
 
-  const members = loadGuildMembers();
-  const tableBody = document.getElementById('memberTableBody');
-  tableBody.innerHTML = '';
+        document.getElementById("pageTitle").textContent = `第${currentRound}回 ギルドバトル 模擬戦結果入力ページ`;
 
-  members.forEach(member => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${member.id}</td>
-      <td>${member.name}</td>
-      <td>${member.level}</td>
-      <td>${member.power}</td>
-      <td><button class="select-btn" onclick="selectMember('${member.id}')">選択</button></td>
-    `;
-    tableBody.appendChild(row);
-  });
-}
-async function selectMember(id) {
-  const members = loadGuildMembers();
-  const member = members.find(m => m.id === id);
+        // ギルドメンバー情報を取得
+        const { data: memberData, error } = await db
+          .from("guild_members")
+          .select("*")
+          .eq("id", loginId)
+          .single();
 
-  if (!member) {
-    alert('プレイヤー情報が見つかりません');
-    return;
-  }
+        if (error || !memberData) {
+          alert("プレイヤー情報を取得できませんでした。");
+          return;
+        }
 
-  document.getElementById('playerName').value = member.name;
-  document.getElementById('playerLevel').value = member.level;
-  document.getElementById('playerPower').value = member.power;
-  document.getElementById('playerId').value = member.id;
-
-  const { data, error } = await db
-    .from('guild_battle_records')
-    .select('*')
-    .eq('id', id)
-    .eq('round', currentRound)
-    .single();
-
-  if (error || !data) {
-    clearInputs(false);
-    return;
-  }
-
-  document.getElementById('stg1').value = data.stg1 || '';
-  document.getElementById('stg2').value = data.stg2 || '';
-  document.getElementById('stg3').value = data.stg3 || '';
-  document.getElementById('stg4').value = data.stg4 || '';
-  document.getElementById('stg5').value = data.stg5 || '';
-  document.getElementById('stg6').value = data.stg6 || '';
-
-  document.querySelectorAll('.battle-time').forEach(cb => cb.checked = false);
-  if (data.times) {
-    data.times.split(',').forEach(time => {
-      const checkbox = document.querySelector(`.battle-time[value="${time}"]`);
-      if (checkbox) checkbox.checked = true;
-    });
-  }
-}
-async function saveBattleData() {
-  const playerId = document.getElementById('playerId').value;
-  if (!playerId) {
-    alert('プレイヤーを選択してください！');
-    return;
-  }
-
-  const stageIds = ['stg1', 'stg2', 'stg3', 'stg4', 'stg5', 'stg6'];
-  const stageValues = {};
-
-  for (const id of stageIds) {
-    const val = document.getElementById(id).value.trim();
-    if (!/^\d{1,3}$/.test(val) || parseInt(val, 10) > 100) {
-      alert(`${id.toUpperCase()} は半角数字かつ100以下で入力してください`);
-      return;
-    }
-    stageValues[id] = parseInt(val, 10);
-  }
-
-  const times = Array.from(document.querySelectorAll('.battle-time:checked')).map(el => el.value).join(',');
-
-  const now = new Date();
-  const updatedAt = now.toISOString(); // Supabaseのtimestamp形式に変換
-
-  const battleData = {
-    id: playerId,
-    round: currentRound,
-    ...stageValues,
-    times,
-    updated_at: updatedAt
-  };
-
-  // SupabaseにデータをINSERT or UPDATE
-  const { data, error } = await db
-    .from('guild_battle_records')
-    .upsert([battleData], { onConflict: ['id', 'round'] });
-
-  if (error) {
-    console.error('保存に失敗:', error);
-    alert('データの保存に失敗しました。');
-  } else {
-    alert(`データを保存しました！（更新日時: ${updatedAt}）`);
-    clearInputs(true);
-    window.location.href = `guild_battle_view.html?loginId=${loginId}`;
-  }
-}
-    function clearInputs(includePlayer = false) {
-      ['stg1', 'stg2', 'stg3', 'stg4', 'stg5', 'stg6'].forEach(id => {
-        document.getElementById(id).value = '';
-      });
-
-      document.querySelectorAll('.battle-time').forEach(cb => cb.checked = false);
-
-      if (includePlayer) {
-        document.getElementById('playerName').value = '';
-        document.getElementById('playerLevel').value = '';
-        document.getElementById('playerPower').value = '';
-        document.getElementById('playerId').value = '';
+        document.getElementById("playerName").value = memberData.name;
+        document.getElementById("playerLevel").value = memberData.level;
+        document.getElementById("playerPower").value = memberData.power;
       }
 
-    }
+      async function saveBattleData() {
+        const stgData = {
+          stg1: document.getElementById("stg1").value || 0,
+          stg2: document.getElementById("stg2").value || 0,
+          stg3: document.getElementById("stg3").value || 0,
+          stg4: document.getElementById("stg4").value || 0,
+          stg5: document.getElementById("stg5").value || 0,
+          stg6: document.getElementById("stg6").value || 0,
+        };
 
-let loginRole = 'member';
+        const times = Array.from(document.querySelectorAll(".battle-time:checked"))
+          .map(el => el.value)
+          .join(",");
 
-function initializePage() {
-  const guildBattleSettings = JSON.parse(localStorage.getItem('guildBattleSettings')) || [];
-  const ongoingBattle = guildBattleSettings.find(s => s.status === 'ongoing');
+        const battleData = {
+          id: loginId,
+          round: currentRound,
+          ...stgData,
+          times,
+          updated_at: new Date().toISOString(),
+        };
 
-  if (!ongoingBattle) {
-    alert('開催中のギルドバトルが設定されていません。');
-    window.location.href = 'index.html';
-    return;
-  }
+        const { error } = await db
+          .from("guild_battle_records")
+          .upsert([battleData], { onConflict: ["id", "round"] });
 
-currentRound = parseInt(ongoingBattle.round.replace('第', '').replace('回', ''));
+        if (error) {
+          console.error("❌ 保存失敗:", error);
+          alert("データの保存に失敗しました。");
+        } else {
+          alert("データを保存しました！");
+          window.location.href = `guild_battle_view.html?loginId=${loginId}`;
+        }
+      }
 
-const guildMembers = loadGuildMembers();
-const loginMember = guildMembers.find(m => m.id === loginId);
-loginRole = loginMember?.role || 'member';  // ← ここ、let をつけない！既にグローバルで定義済み
-
-document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル 模擬戦結果入力ページ`;
-
-loadGuildMembersTable();
-const urlId = getUrlParam('id');
-if (urlId) selectMember(urlId);
-}
-
-window.onload = initializePage;
-    
-</script>
-
+      window.onload = initializePage;
+    </script>
+  </div>
 </body>
 </html>
