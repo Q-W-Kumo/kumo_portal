@@ -683,6 +683,11 @@ async function initializePage() {
     const loginId = sessionStorage.getItem("loginId");
     const loginRole = sessionStorage.getItem("loginRole");
 
+    console.log("🟢 goToBattleInputPage() 呼び出し");
+    console.log("🔍 取得した loginId:", loginId);
+    console.log("🔍 取得した loginRole:", loginRole);
+    console.log("🔍 取得した currentRound:", currentRound);
+
     if (!loginId || !loginRole) {
         alert("ログイン情報が取得できません。再度ログインしてください。");
         window.location.href = "guild_home.html";
@@ -700,7 +705,9 @@ async function initializePage() {
         loginRole: loginRole,
         round: currentRound
     });
-      
+
+    console.log("✅ 遷移先:", `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`);
+  
     // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
     window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
 }
