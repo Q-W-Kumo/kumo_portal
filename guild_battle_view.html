@@ -608,11 +608,17 @@ async function fetchChallengeStatus() {
 
 // 🔹 5️⃣ ページ初期化処理
 async function initializePage() {
-    // ギルドバトル設定取得
+  console.log("initializePage() 開始");  
+  
+  // ギルドバトル設定取得
     const ongoingBattle = await fetchOngoingBattle();
-    if (!ongoingBattle) return;
+    if (!ongoingBattle) {
+        console.error("開催中のギルドバトルが取得できません");
+        return;
+    }
 
     currentRound = ongoingBattle.round;
+    console.log(`現在のギルドバトル回数: ${currentRound}`);
 
     // ページタイトル設定
     document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
@@ -621,15 +627,28 @@ async function initializePage() {
     if (ongoingBattle.bgImageUrl) {
         document.body.style.backgroundImage = `url('${ongoingBattle.bgImageUrl}')`;
     }
-
-      scrollInfo.innerHTML = `<span class="fixed-text">🟢 ギルドバトル情報 ➤ ボスエネミー:</span> <span class="variable-text">${ongoingBattle.enemyTarget}</span> <span class="fixed-text">｜ 弱点属性:</span> <span class="variable-text">${(ongoingBattle.attributes || []).join(' / ')}</span> <span class="fixed-text">｜ 弱点種別:</span> <span class="variable-text">${(ongoingBattle.type || []).join(' / ')}</span> <span class="fixed-text">🟢</span>`;
-    }
-
     // メンバーとバトル結果、挑戦状況の取得
     guildMembers = await fetchGuildMembers();  // 🔹 Supabaseから取得
     battleRecords = await fetchBattleRecords(currentRound);
     challengeStatus = await fetchChallengeStatus();
 
+        console.log("ギルドメンバー:", guildMembers);
+    console.log("バトル記録:", battleRecords);
+    console.log("挑戦状況:", challengeStatus);
+
+    if (!guildMembers.length || !battleRecords.length) {
+        console.warn("データが取得できませんでした");
+        return;
+    }
+
+    // 3️⃣ スクロール情報を設定
+    scrollInfo.innerHTML = `<span class="fixed-text">🟢 ギルドバトル情報 ➤ ボスエネミー:</span> 
+    <span class="variable-text">${ongoingBattle.enemyTarget}</span> 
+    <span class="fixed-text">｜ 弱点属性:</span> <span class="variable-text">${(ongoingBattle.attributes || []).join(' / ')}</span> 
+    <span class="fixed-text">｜ 弱点種別:</span> <span class="variable-text">${(ongoingBattle.type || []).join(' / ')}</span> 
+    <span class="fixed-text">🟢</span>`;
+
+    // 4️⃣ テーブルを描画
     renderTable();
 }
 
