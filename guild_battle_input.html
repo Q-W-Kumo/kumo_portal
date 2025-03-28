@@ -316,18 +316,19 @@
 
   <!-- 共通スクリプト -->
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const loginId = urlParams.get('loginId') || '未取得';
-    const loginRole = urlParams.get("role") || 'member';
-    const currentRound = parseInt(urlParams.get("round"), 10) || 0;
-    document.getElementById('loginIdBox').textContent = `ログインID: ${loginId}`;
+  const urlParams = new URLSearchParams(window.location.search);
+  let loginId = urlParams.get("loginId") || sessionStorage.getItem("loginId") || "未取得";
+  let loginRole = urlParams.get("role") || sessionStorage.getItem("loginRole") || "member";
+  let currentRound = parseInt(urlParams.get("round"), 10) || sessionStorage.getItem("currentRound") || 0;
+
+  document.getElementById("loginIdBox").textContent = `ログインID: ${loginId}`;
 
 function navigatePage(page) {
   if (page === 'guild_master.html' && loginRole !== 'GM') {
     alert('このページへはアクセスできません（ギルマス限定）');
     return;
   }
-  window.location.href = `${page}?loginId=${loginId}`;
+  window.location.href = `${page}?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}`;
 }
 
     // メイン機能スクリプト
