@@ -617,7 +617,8 @@ async function initializePage() {
         return;
     }
 
-    currentRound = Number(ongoingBattle.round) || 0; // ✅ 数値として扱う
+    currentRound = parseInt(ongoingBattle.round.replace('第', '').replace('回', ''), 10) || 0;
+    console.log(`🔍 修正後の round: ${currentRound}`); // ✅ 確認用ログ
 
     // ページタイトル設定
     document.getElementById('pageTitle').textContent = `${ongoingBattle.round}ギルドバトル模擬戦結果一覧ページ`;
