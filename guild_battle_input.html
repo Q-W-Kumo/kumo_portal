@@ -324,13 +324,18 @@
   document.getElementById("loginIdBox").textContent = `ログインID: ${loginId}`;
 
 function navigatePage(page) {
-  if (page === 'guild_master.html' && loginRole !== 'GM') {
-    alert('このページへはアクセスできません（ギルマス限定）');
+  // ✅ loginId, loginRole を sessionStorage から再取得
+  const loginId = sessionStorage.getItem("loginId") || "未取得";
+  const loginRole = sessionStorage.getItem("loginRole") || "member";
+
+  if (page === "guild_master.html" && loginRole !== "GM") {
+    alert("このページへはアクセスできません（ギルマス限定）");
     return;
   }
+
+  // ✅ URL に loginId と role を渡す
   window.location.href = `${page}?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}`;
 }
-
     // メイン機能スクリプト
     let currentRound = 0;
 
@@ -367,19 +372,28 @@ async function loadBattleRecords() {
   }
   return data;
 }
-function loadGuildMembersTable() {
-  // 役割が GM または SM でない場合は非表示
-  if (loginRole !== 'GM' && loginRole !== 'SM') {
-    document.querySelector('.subform-table').style.display = 'none'; // 表自体を非表示
+async function fetchGuildMembers() {
+  const { data, error } = await db.from("guild_members").select("*");
+
+  if (error) {
+    console.error("❌ メンバー取得エラー:", error);
+    return [];
+  }
+  return data;
+}
+
+async function loadGuildMembersTable() {
+  if (loginRole !== "GM" && loginRole !== "SM") {
+    document.querySelector(".subform-table").style.display = "none";
     return;
   }
 
-  const members = loadGuildMembers();
-  const tableBody = document.getElementById('memberTableBody');
-  tableBody.innerHTML = '';
+  const members = await fetchGuildMembers();
+  const tableBody = document.getElementById("memberTableBody");
+  tableBody.innerHTML = "";
 
-  members.forEach(member => {
-    const row = document.createElement('tr');
+  members.forEach((member) => {
+    const row = document.createElement("tr");
     row.innerHTML = `
       <td>${member.id}</td>
       <td>${member.name}</td>
@@ -390,7 +404,8 @@ function loadGuildMembersTable() {
     tableBody.appendChild(row);
   });
 }
-async function selectMember(id) {
+    
+  async function selectMember(id) {
   const members = loadGuildMembers();
   const member = members.find(m => m.id === id);
 
@@ -432,13 +447,13 @@ async function selectMember(id) {
   }
 }
 async function saveBattleData() {
-  const playerId = document.getElementById('playerId').value;
+  const playerId = document.getElementById("playerId").value;
   if (!playerId) {
-    alert('プレイヤーを選択してください！');
+    alert("プレイヤーを選択してください！");
     return;
   }
 
-  const stageIds = ['stg1', 'stg2', 'stg3', 'stg4', 'stg5', 'stg6'];
+  const stageIds = ["stg1", "stg2", "stg3", "stg4", "stg5", "stg6"];
   const stageValues = {};
 
   for (const id of stageIds) {
@@ -450,33 +465,32 @@ async function saveBattleData() {
     stageValues[id] = parseInt(val, 10);
   }
 
-  const times = Array.from(document.querySelectorAll('.battle-time:checked')).map(el => el.value).join(',');
+  const times = Array.from(document.querySelectorAll(".battle-time:checked"))
+    .map((el) => el.value)
+    .join(",");
 
   const now = new Date();
-  const updatedAt = now.toISOString(); // Supabaseのtimestamp形式に変換
+  const updatedAt = now.toISOString();
 
   const battleData = {
     id: playerId,
     round: currentRound,
     ...stageValues,
     times,
-    updated_at: updatedAt
+    updated_at: updatedAt,
   };
 
-  // SupabaseにデータをINSERT or UPDATE
-  const { data, error } = await db
-    .from('guild_battle_records')
-    .upsert([battleData], { onConflict: ['id', 'round'] });
+  const { data, error } = await db.from("guild_battle_records").upsert([battleData], { onConflict: ["id", "round"] });
 
   if (error) {
-    console.error('保存に失敗:', error);
-    alert('データの保存に失敗しました。');
+    console.error("保存に失敗:", error);
+    alert("データの保存に失敗しました。");
   } else {
     alert(`データを保存しました！（更新日時: ${updatedAt}）`);
-    clearInputs(true);
     window.location.href = `guild_battle_view.html?loginId=${loginId}`;
   }
-}
+} 
+    
     function clearInputs(includePlayer = false) {
       ['stg1', 'stg2', 'stg3', 'stg4', 'stg5', 'stg6'].forEach(id => {
         document.getElementById(id).value = '';
@@ -522,8 +536,9 @@ async function initializePage() {
 
   console.log("✅ 取得したギルドバトル:", ongoingBattle);
 
-  // 🔹 バトル回数を取得
+  // 🔹 バトル回数を取得し、セッションストレージに保存
   currentRound = parseInt(ongoingBattle.round.replace("第", "").replace("回", ""), 10);
+  sessionStorage.setItem("currentRound", currentRound); // ⭐️ 追加（セッションストレージに保存）
   console.log("🔍 修正後の currentRound:", currentRound);
 
   // 🔹 ページタイトルを更新
@@ -542,8 +557,9 @@ async function initializePage() {
   if (urlId) selectMember(urlId);
 }
 
-window.onload = initializePage;    
-</script>
+window.onload = initializePage;
+  
+  </script>
 
 </body>
 </html>
