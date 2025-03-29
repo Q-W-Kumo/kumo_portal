@@ -844,18 +844,16 @@ if (!loginId || !loginRole) {
           row.appendChild(cell);
         });
 
-    const timeIcons = { "早朝": "🌅", "朝": "☀️", "昼": "🌞", "夜": "🌙", "深夜": "🌌" };
-    const timesCell = document.createElement('td');
+const timeIcons = { "早朝": "🌅", "朝": "☀️", "昼": "🌞", "夜": "🌙", "深夜": "🌌" };
+const timesCell = document.createElement('td');
 
-// `record.times` をJSONとして解析
-let battleTimes = [];
-if (record?.times) {
-    battleTimes = record.times.split(",");  // ✅ カンマ区切りで配列化
-}
-        
+// ✅ `record.times` を JSON.parse() せず、カンマ区切りで分割
+let battleTimes = record?.times ? record.times.split(",") : [];
+
 timesCell.innerHTML = battleTimes.length
     ? `<div class="battle-times">${battleTimes.map(t => timeIcons[t] || '❓').join('')}</div>`
     : '-';
+
 row.appendChild(timesCell);
 
 const updateTimeCell = document.createElement('td');
