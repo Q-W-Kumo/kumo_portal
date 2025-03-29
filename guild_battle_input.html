@@ -250,7 +250,7 @@
 
     <div class="menu-header"><i class="fas fa-bars"></i>メニュー</div>
 
-    <button class="menu-button" onclick="navigatePage('guild_home.html')">
+    <button class="menu-button" onclick="navigatePage('index.html')">
       <i class="fas fa-house"></i> ホーム
     </button>
     <button class="menu-button" onclick="navigatePage('guild_battle_view.html')">
@@ -488,7 +488,7 @@ async function initializePage() {
 
   if (!loginId || !loginRole) {
     alert("ログイン情報が取得できません。再度ログインしてください。");
-    window.location.href = "guild_home.html";
+    window.location.href = "index.html";
     return;
   }
 
