@@ -863,7 +863,6 @@ function convertToJST(isoString) {
     if (!isoString) return "-";
     
     const date = new Date(isoString);
-    date.setHours(date.getHours() + 9); // UTC → JST（日本時間は +9時間）
 
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0'); // 月は0始まりなので+1
