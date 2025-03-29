@@ -321,6 +321,14 @@
   let loginRole = urlParams.get("role") || sessionStorage.getItem("loginRole") || "member";
   let currentRound = parseInt(urlParams.get("round"), 10) || sessionStorage.getItem("currentRound") || 0;
 
+  // ✅ URL からログイン情報を取得し、sessionStorage に保存
+  if (loginId !== "未取得") {
+    sessionStorage.setItem("loginId", loginId);
+  }
+  if (loginRole !== "member") {
+    sessionStorage.setItem("loginRole", loginRole);
+  }    
+
   document.getElementById("loginIdBox").textContent = `ログインID: ${loginId}`;
 
 function navigatePage(page) {
@@ -547,7 +555,7 @@ async function initializePage() {
   // 🔹 ギルドメンバー情報を Supabase から取得
   const guildMembers = await fetchGuildMembers();
   const loginMember = guildMembers.find(m => m.id === loginId);
-  loginRole = loginMember?.role || "member"; // ← 既にグローバルで定義済みなので `let` は不要
+  loginRole = loginMember?.role || "member"; 
 
   // 🔹 ギルドメンバー一覧のテーブルを読み込む
   loadGuildMembersTable();
@@ -557,8 +565,8 @@ async function initializePage() {
   if (urlId) selectMember(urlId);
 }
 
-window.onload = initializePage;
-  
+window.onload = initializePage;  
+    
   </script>
 
 </body>
