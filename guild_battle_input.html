@@ -544,9 +544,12 @@ async function initializePage() {
   // ✅ ギルドメンバー一覧をロード
   await loadGuildMembersTable();
 
-  // 🔹 URL から ID が渡されている場合、該当メンバーを選択
+  // ✅ URL から `id` を取得し、自動で `selectMember(id)` を実行
   const urlId = getUrlParam("id");
-  if (urlId) selectMember(urlId);
+  if (urlId) {
+    console.log("🔍 URL から取得した ID:", urlId);
+    selectMember(urlId);  // ✅ 自動でプレイヤー情報を表示
+  }
 }
 
 window.onload = initializePage;
