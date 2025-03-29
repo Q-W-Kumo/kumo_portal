@@ -478,15 +478,16 @@ async function initializePage() {
   console.log("🟢 initializePage() 実行開始");
 
   // ✅ セッションストレージからログイン情報を取得
-  let loginId = sessionStorage.getItem("loginId") || "未取得";
-  let loginRole = sessionStorage.getItem("loginRole") || "member";
-  let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
+  let loginId = sessionStorage.getItem("loginId");
+  let loginRole = sessionStorage.getItem("loginRole");
+  let currentRound = sessionStorage.getItem("currentRound");
 
   console.log("🔍 sessionStorage から取得:");
   console.log("🔍 loginId:", loginId);
   console.log("🔍 loginRole:", loginRole);
   console.log("🔍 currentRound:", currentRound);
 
+  // 🔹 ログイン情報が取得できない場合、再ログインを要求
   if (!loginId || !loginRole) {
     alert("ログイン情報が取得できません。再度ログインしてください。");
     window.location.href = "guild_home.html";
