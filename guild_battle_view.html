@@ -849,12 +849,10 @@ if (!loginId || !loginRole) {
 
 // `record.times` をJSONとして解析
 let battleTimes = [];
-try {
-    battleTimes = record?.times ? JSON.parse(record.times) : [];
-} catch (e) {
-    console.error("❌ 参加時間の解析エラー:", e);
+if (record?.times) {
+    battleTimes = record.times.split(",");  // ✅ カンマ区切りで配列化
 }
-
+        
 timesCell.innerHTML = battleTimes.length
     ? `<div class="battle-times">${battleTimes.map(t => timeIcons[t] || '❓').join('')}</div>`
     : '-';
