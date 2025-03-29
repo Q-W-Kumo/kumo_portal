@@ -857,7 +857,28 @@ timesCell.innerHTML = battleTimes.length
 row.appendChild(timesCell);
 
 const updateTimeCell = document.createElement('td');
-updateTimeCell.innerHTML = `<div class="update-time">${record?.updated_at || '-'}</div>`;
+
+// ✅ 日本時間に変換する関数
+function convertToJST(isoString) {
+    if (!isoString) return "-";
+    
+    const date = new Date(isoString);
+    date.setHours(date.getHours() + 9); // UTC → JST（日本時間は +9時間）
+
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // 月は0始まりなので+1
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mi = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+}
+
+// ✅ 更新時間を日本時間に変換
+const formattedTime = convertToJST(record?.updated_at);
+
+updateTimeCell.innerHTML = `<div class="update-time">${formattedTime}</div>`;
 row.appendChild(updateTimeCell);
 
 const actionCell = document.createElement('td');
