@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>幻影旅団ー蜘蛛ー ポータルサイト</title>
+  <title>幻影旅団-蜘蛛- ポータルサイト</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script>
@@ -11,8 +11,6 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
 
   <style>
     body {
@@ -24,37 +22,22 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
-      position: relative;
-    }
-
-    /* 背景画像の配置 */
-    body::after {
-      content: "";
-      background: url('https://i.imgur.com/U1uTloN.png') no-repeat right bottom;
-      background-size: 200px;
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      width: 200px;
-      height: 200px;
-      opacity: 0.8;
-      pointer-events: none;
+      background: url('https://i.imgur.com/GWT1mh7.png') no-repeat right bottom fixed;
+      background-size: contain;
     }
     .container {
       background-color: #1e1e1e;
-      padding: 25px;
+      padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-      width: 360px;
+      width: 320px;
       text-align: center;
     }
-
     h2 {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       font-size: 20px;
       white-space: nowrap;
     }
-
     input[type="text"] {
       width: 100%;
       padding: 10px;
@@ -63,11 +46,9 @@
       border: none;
       font-size: 16px;
     }
-
     label {
       font-size: 14px;
     }
-
     .button {
       width: 100%;
       padding: 12px;
@@ -79,33 +60,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
-
     .login-btn {
-      background-color: #2196F3; /* 青に変更 */
+      background-color: #1976D2;
       color: white;
     }
-
     .master-btn {
-      background-color: #2ECC71;
+      background-color: #4CAF50;
       color: white;
     }
-
     .logout-btn {
       background-color: #d32f2f;
       color: white;
     }
-
     .button i {
       font-size: 18px;
     }
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 </head>
 <body>
 
   <div class="container">
-    <h2>幻影旅団ー蜘蛛ー ポータルサイト</h2>
+    <h2>幻影旅団-蜘蛛- ポータルサイト</h2>
     <input type="text" id="userId" placeholder="ユーザーIDを入力">
     <br>
     <label><input type="checkbox" id="rememberMe"> IDを記憶する</label>
@@ -141,47 +120,38 @@
 
       console.log("🔍 入力されたユーザーID:", userId);
 
-      try {
-        let { data, error } = await db
-          .from("guild_members")
-          .select("id, name, role")
-          .eq("id", userId)
-          .single();
+      let { data, error } = await db
+        .from("guild_members")
+        .select("id, role, name")
+        .eq("id", userId)
+        .single();
 
-        console.log("🛠️ Supabase からのレスポンス:", data, error);
+      console.log("🛠️ Supabase からのレスポンス:", data, error);
 
-        if (error || !data) {
-          console.error("❌ ユーザーが見つかりません:", error);
-          alert("ユーザーが見つかりません");
-          return;
-        }
-
-        // ✅ ユーザー情報を sessionStorage に保存
-        sessionStorage.setItem("loginId", data.id);
-        sessionStorage.setItem("loginRole", data.role);
-        sessionStorage.setItem("userName", data.name); // 名前も保存
-
-        // ✅ ローカルストレージにも保存（チェックが入っている場合）
-        if (rememberMe) {
-          localStorage.setItem("userId", userId);
-        } else {
-          localStorage.removeItem("userId");
-        }
-
-        // ✅ ようこそポップアップを表示
-        alert(`ようこそ！${data.name}さん、本日もよろしくお願いします！`);
-
-        console.log("✅ ページ遷移を実行: guild_battle_view.html");
-        
-        // ✅ ページ遷移（ログイン情報をURLに含める）
-        setTimeout(() => {
-          window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(data.id)}&role=${encodeURIComponent(data.role)}`;
-        }, 500);
-
-      } catch (err) {
-        console.error("❌ ログイン処理中にエラーが発生:", err);
-        alert("ログイン処理中に問題が発生しました");
+      if (error || !data) {
+        alert("ユーザーが見つかりません");
+        return;
       }
+
+      // ユーザー情報を sessionStorage に保存
+      sessionStorage.setItem("loginId", data.id);
+      sessionStorage.setItem("loginRole", data.role);
+      sessionStorage.setItem("userName", data.name);
+
+      if (rememberMe) {
+        localStorage.setItem("userId", userId);
+      } else {
+        localStorage.removeItem("userId");
+      }
+
+      alert(`ようこそ！${data.name}さん、本日もよろしくお願いします！`);
+
+      console.log("🔄 ページ遷移を実行: guild_battle_view.html");
+      
+      // ✅ ここでログイン情報を渡して guild_battle_view.html に遷移
+      setTimeout(() => {
+        window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(data.id)}&role=${encodeURIComponent(data.role)}`;
+      }, 500);
     }
 
     function goToMaster() {
