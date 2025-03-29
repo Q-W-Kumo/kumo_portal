@@ -415,7 +415,8 @@ async function loadGuildMembersTable() {
 }
     
   async function selectMember(id) {
-  const members = loadGuildMembers();
+  // 🔹 Supabase からメンバー情報を取得
+  const members = await fetchGuildMembers(); // ✅ 修正点
   const member = members.find(m => m.id === id);
 
   if (!member) {
