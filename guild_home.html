@@ -55,8 +55,6 @@
       font-size: 16px;
       padding: 10px;
       margin: 10px auto;
-      background-color: #2196F3;
-      color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
@@ -66,14 +64,38 @@
       transition: background-color 0.3s;
     }
 
+    /* ログインボタン（青） */
+    .login-button {
+      background-color: #2196F3;
+      color: #fff;
+    }
+    .login-button:hover {
+      background-color: #1976D2;
+    }
+
+    /* マスタメンテナンスボタン（緑） */
+    .master-button {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+    .master-button:hover {
+      background-color: #388E3C;
+    }
+
+    /* ログアウトボタン（赤） */
+    .logout-button {
+      background-color: #FF3333;
+      color: #fff;
+    }
+    .logout-button:hover {
+      background-color: #D32F2F;
+    }
+
     .menu-button i {
       margin-right: 10px; /* アイコンとテキストの間隔 */
       font-size: 18px;
     }
 
-    .menu-button:hover {
-      background-color: #1976D2;
-    }
   </style>
 </head>
 <body>
@@ -86,21 +108,19 @@
       <input type="text" id="loginId" placeholder="プレイヤーIDを入力">
     </div>
 
-    <!-- ボタン -->
-    <button class="menu-button" onclick="login()">
+    <!-- ログインボタン（ギルドバトル結果） -->
+    <button class="menu-button login-button" onclick="login()">
       <i class="fas fa-sign-in-alt"></i> ログイン
     </button>
-    
-    <button class="menu-button" onclick="navigatePage('guild_battle_view.html')">
-      <i class="fas fa-database"></i> ギルドバトル結果
+
+    <!-- マスタメンテナンス（緑色） -->
+    <button class="menu-button master-button" onclick="navigatePage('guild_master.html')">
+      <i class="fas fa-cogs"></i> マスタメンテナンス
     </button>
 
-    <button class="menu-button" onclick="navigatePage('guild_battle_input.html')">
-      <i class="fas fa-pen-to-square"></i> データ入力
-    </button>
-
-    <button class="menu-button" onclick="navigatePage('guild_master.html')">
-      <i class="fas fa-cogs"></i> マスタ管理
+    <!-- ログアウトボタン（赤色） -->
+    <button class="menu-button logout-button" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> ログアウト
     </button>
   </div>
 
@@ -121,6 +141,12 @@
         return;
       }
       window.location.href = `${page}?loginId=${encodeURIComponent(loginId)}`;
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      alert("ログアウトしました。");
+      window.location.href = "guild_home.html";
     }
   </script>
 
