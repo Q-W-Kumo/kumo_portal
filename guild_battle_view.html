@@ -387,6 +387,26 @@
 
 /* ▲▲▲ モバイル対応ここまで ▲▲▲ */
 
+/* ====== 背景画像の位置修正 ====== */
+    body {
+      background-size: contain;
+      background-position: center;
+    }
+
+    /* スマホ用（背景画像を左上に調整） */
+    @media (max-width: 768px) {
+      body {
+        background-size: 100px;
+        background-position: top left;
+      }
+    }
+
+    /* ====== テロップの修正 ====== */
+    @media (max-width: 768px) {
+      .scroll-text {
+        animation: scrollText 15s linear infinite !important;
+        font-size: 18px;
+      }
 
   </style>
 </head>
