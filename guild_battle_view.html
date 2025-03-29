@@ -706,6 +706,12 @@ if (!loginId || !loginRole) {
         console.error("⚠️ currentRound の値が無効:", currentRound);
         return;
     }
+    
+    // ✅ セッションストレージに明示的にセット
+    sessionStorage.setItem("currentRound", currentRound);
+    sessionStorage.setItem("loginId", loginId);
+    sessionStorage.setItem("loginRole", loginRole);  
+      
     // 🔍 デバッグログを追加
     console.log("🔍 現在のログイン情報:", {
         loginId: loginId,
