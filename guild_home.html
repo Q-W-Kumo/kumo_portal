@@ -24,6 +24,21 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
+      position: relative;
+    }
+
+    /* 背景画像の配置 */
+    body::after {
+      content: "";
+      background: url('https://i.imgur.com/U1uTloN.png') no-repeat right bottom;
+      background-size: 200px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 200px;
+      height: 200px;
+      opacity: 0.8;
+      pointer-events: none;
     }
 
     .container {
@@ -31,14 +46,14 @@
       padding: 25px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-      width: 360px; /* フォームを横長に調整 */
+      width: 360px;
       text-align: center;
     }
 
     h2 {
       margin-bottom: 20px;
       font-size: 20px;
-      white-space: nowrap; /* 2行にならないようにする */
+      white-space: nowrap;
     }
 
     input[type="text"] {
@@ -69,12 +84,12 @@
     }
 
     .login-btn {
-      background-color: #4CAF50;
+      background-color: #2196F3; /* 青に変更 */
       color: white;
     }
 
     .master-btn {
-      background-color: #2ECC71; /* 緑色 */
+      background-color: #2ECC71;
       color: white;
     }
 
@@ -130,7 +145,7 @@
       try {
         let { data, error } = await db
           .from("guild_members")
-          .select("id, role")
+          .select("id, name, role")
           .eq("id", userId)
           .single();
 
@@ -145,6 +160,7 @@
         // ✅ ユーザー情報を sessionStorage に保存
         sessionStorage.setItem("loginId", data.id);
         sessionStorage.setItem("loginRole", data.role);
+        sessionStorage.setItem("userName", data.name); // 名前も保存
 
         // ✅ ローカルストレージにも保存（チェックが入っている場合）
         if (rememberMe) {
@@ -153,7 +169,8 @@
           localStorage.removeItem("userId");
         }
 
-        alert(`ログイン成功: ${data.id} (${data.role})`);
+        // ✅ ようこそポップアップを表示
+        alert(`ようこそ！${data.name}さん、本日もよろしくお願いします！`);
 
         console.log("✅ ページ遷移を実行: guild_battle_view.html");
         
@@ -186,6 +203,7 @@
       localStorage.removeItem("userId");
       sessionStorage.removeItem("loginId");
       sessionStorage.removeItem("loginRole");
+      sessionStorage.removeItem("userName");
       document.getElementById("userId").value = "";
       document.getElementById("rememberMe").checked = false;
       alert("ログアウトしました");
