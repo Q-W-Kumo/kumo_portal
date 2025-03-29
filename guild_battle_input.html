@@ -476,6 +476,12 @@ let loginRole = 'member';
 
 async function initializePage() {
   console.log("🟢 initializePage() 実行開始");
+
+// ✅ セッションストレージからログイン情報を取得
+    let loginId = sessionStorage.getItem("loginId") || "未取得";
+    let loginRole = sessionStorage.getItem("loginRole") || "member";
+    let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
+
   console.log("🔍 loginId:", loginId);
   console.log("🔍 loginRole:", loginRole);
   console.log("🔍 currentRound:", currentRound);
