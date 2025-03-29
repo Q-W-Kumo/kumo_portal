@@ -478,9 +478,9 @@ async function initializePage() {
   console.log("🟢 initializePage() 実行開始");
 
   // ✅ セッションストレージからログイン情報を取得
-  let loginId = sessionStorage.getItem("loginId");
-  let loginRole = sessionStorage.getItem("loginRole");
-  let currentRound = sessionStorage.getItem("currentRound");
+  let loginId = sessionStorage.getItem("loginId") || "未取得";
+  loginRole = sessionStorage.getItem("loginRole") || "member"; // 🔹 `let` を削除して変数更新
+  let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
 
   console.log("🔍 sessionStorage から取得:");
   console.log("🔍 loginId:", loginId);
@@ -539,9 +539,8 @@ async function initializePage() {
 
   console.log("✅ 取得したギルドメンバー:", guildMembers);
 
-  // 🔹 ログインユーザーの役割を更新
-  const loginMember = guildMembers.find(m => m.id === loginId);
-  loginRole = loginMember?.role || "member";
+  // 🔹 ログインユーザーの役割を更新（`let` を使わずに `loginRole` を上書き）
+  loginRole = guildMembers.find(m => m.id === loginId)?.role || "member";
   console.log("🔍 更新後の loginRole:", loginRole);
 
   // ✅ ギルドメンバー一覧をロード
