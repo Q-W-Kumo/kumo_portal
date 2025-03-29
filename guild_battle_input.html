@@ -482,7 +482,8 @@ async function initializePage() {
     let loginRole = sessionStorage.getItem("loginRole") || "member";
     let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
 
-  console.log("🔍 loginId:", loginId);
+　console.log("🔍 sessionStorage から取得:");  
+　console.log("🔍 loginId:", loginId);
   console.log("🔍 loginRole:", loginRole);
   console.log("🔍 currentRound:", currentRound);
 
@@ -491,6 +492,14 @@ async function initializePage() {
     window.location.href = "guild_home.html";
     return;
   }
+
+　// ✅ ログインIDを画面に反映
+  const loginIdBox = document.getElementById("loginIdBox");
+  if (loginIdBox) {
+    loginIdBox.textContent = `ログイン中: ${loginId} (${loginRole})`;
+    console.log("✅ loginIdBox 更新:", loginIdBox.textContent);
+  } else {
+    console.error("❌ loginIdBox が見つかりません！");
 
   // 🔹 Supabaseから開催中のギルドバトル情報を取得
   const { data: ongoingBattle, error } = await db
@@ -519,6 +528,9 @@ async function initializePage() {
   const guildMembers = await fetchGuildMembers();
   const loginMember = guildMembers.find(m => m.id === loginId);
   loginRole = loginMember?.role || "member"; 
+　
+　// ✅ ギルドメンバー一覧をロード
+　await loadGuildMembersTable();
 
   // 🔹 ギルドメンバー一覧のテーブルを読み込む
   loadGuildMembersTable();
