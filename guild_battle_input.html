@@ -477,13 +477,13 @@ let loginRole = 'member';
 async function initializePage() {
   console.log("🟢 initializePage() 実行開始");
 
-// ✅ セッションストレージからログイン情報を取得
-    let loginId = sessionStorage.getItem("loginId") || "未取得";
-    let loginRole = sessionStorage.getItem("loginRole") || "member";
-    let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
+  // ✅ セッションストレージからログイン情報を取得
+  let loginId = sessionStorage.getItem("loginId") || "未取得";
+  let loginRole = sessionStorage.getItem("loginRole") || "member";
+  let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
 
-　console.log("🔍 sessionStorage から取得:");  
-　console.log("🔍 loginId:", loginId);
+  console.log("🔍 sessionStorage から取得:");
+  console.log("🔍 loginId:", loginId);
   console.log("🔍 loginRole:", loginRole);
   console.log("🔍 currentRound:", currentRound);
 
@@ -493,13 +493,14 @@ async function initializePage() {
     return;
   }
 
-　// ✅ ログインIDを画面に反映
+  // ✅ ログインIDを画面に反映
   const loginIdBox = document.getElementById("loginIdBox");
   if (loginIdBox) {
     loginIdBox.textContent = `ログイン中: ${loginId} (${loginRole})`;
     console.log("✅ loginIdBox 更新:", loginIdBox.textContent);
   } else {
     console.error("❌ loginIdBox が見つかりません！");
+  }
 
   // 🔹 Supabaseから開催中のギルドバトル情報を取得
   const { data: ongoingBattle, error } = await db
@@ -518,29 +519,40 @@ async function initializePage() {
 
   // 🔹 バトル回数を取得し、セッションストレージに保存
   currentRound = parseInt(ongoingBattle.round.replace("第", "").replace("回", ""), 10);
-  sessionStorage.setItem("currentRound", currentRound); // ⭐️ 追加（セッションストレージに保存）
+  sessionStorage.setItem("currentRound", currentRound);
   console.log("🔍 修正後の currentRound:", currentRound);
 
   // 🔹 ページタイトルを更新
   document.getElementById("pageTitle").textContent = `${ongoingBattle.round} ギルドバトル 模擬戦結果入力ページ`;
 
   // 🔹 ギルドメンバー情報を Supabase から取得
-  const guildMembers = await fetchGuildMembers();
-  const loginMember = guildMembers.find(m => m.id === loginId);
-  loginRole = loginMember?.role || "member"; 
-　
-　// ✅ ギルドメンバー一覧をロード
-　await loadGuildMembersTable();
+  const { data: guildMembers, error: memberError } = await db
+    .from("guild_members")
+    .select("*");
 
-  // 🔹 ギルドメンバー一覧のテーブルを読み込む
-  loadGuildMembersTable();
+  if (memberError || !guildMembers) {
+    console.error("❌ ギルドメンバーが取得できません:", memberError);
+    alert("ギルドメンバーの取得に失敗しました。");
+    return;
+  }
+
+  console.log("✅ 取得したギルドメンバー:", guildMembers);
+
+  // 🔹 ログインユーザーの役割を更新
+  const loginMember = guildMembers.find(m => m.id === loginId);
+  loginRole = loginMember?.role || "member";
+  console.log("🔍 更新後の loginRole:", loginRole);
+
+  // ✅ ギルドメンバー一覧をロード
+  await loadGuildMembersTable();
 
   // 🔹 URL から ID が渡されている場合、該当メンバーを選択
   const urlId = getUrlParam("id");
   if (urlId) selectMember(urlId);
 }
 
-window.onload = initializePage;  
+window.onload = initializePage;
+
 
 async function saveBattleData() {
   const playerId = document.getElementById("playerId").value;
