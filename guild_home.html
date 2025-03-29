@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>幻影旅団-蜘蛛- ポータルサイト</title>
+  <title>幻影旅団ー蜘蛛ー ポータルサイト</title>
 
-  <!-- フォントとアイコン読み込み -->
-  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Gothic&family=Orbitron&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://jquxvpsjqpnuzxkxintu.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdXh2cHNqcXBudXp4a3hpbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTI1NDgsImV4cCI6MjA1ODQ4ODU0OH0.7iN9_8cm-eMJv_duarRdAIW08khGWqpvcMuQahycK3I";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
 
   <style>
     body {
-      font-family: 'Sawarabi Gothic', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #121212;
       color: #ffffff;
       display: flex;
@@ -20,35 +25,38 @@
       height: 100vh;
       flex-direction: column;
     }
+
     .container {
       background-color: #1e1e1e;
-      padding: 20px;
+      padding: 25px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-      width: 320px;
+      width: 360px; /* フォームを横長に調整 */
       text-align: center;
     }
+
     h2 {
-      margin-bottom: 15px;
-      text-shadow: 0 0 5px rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+      font-size: 20px;
+      white-space: nowrap; /* 2行にならないようにする */
     }
+
     input[type="text"] {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-bottom: 10px;
       border-radius: 4px;
       border: none;
-      text-align: center;
-      background-color: #333;
-      color: #fff;
-      outline: none;
+      font-size: 16px;
     }
+
     label {
       font-size: 14px;
     }
+
     .button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 10px;
       border: none;
       border-radius: 5px;
@@ -57,55 +65,43 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
     }
-    .button i {
-      margin-right: 10px;
-      font-size: 18px;
-    }
-    /* ボタンの色設定 */
+
     .login-btn {
       background-color: #4CAF50;
       color: white;
     }
-    .login-btn:hover {
-      background-color: #388E3C;
-    }
+
     .master-btn {
-      background-color: #2196F3;
+      background-color: #2ECC71; /* 緑色 */
       color: white;
     }
-    .master-btn:hover {
-      background-color: #1976D2;
-    }
+
     .logout-btn {
       background-color: #d32f2f;
       color: white;
     }
-    .logout-btn:hover {
-      background-color: #b71c1c;
+
+    .button i {
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>幻影旅団-蜘蛛- ポータルサイト</h2>
+    <h2>幻影旅団ー蜘蛛ー ポータルサイト</h2>
     <input type="text" id="userId" placeholder="ユーザーIDを入力">
     <br>
     <label><input type="checkbox" id="rememberMe"> IDを記憶する</label>
     <br>
-    
-    <!-- ログインボタン（アイコン付き） -->
     <button class="button login-btn" onclick="login()">
       <i class="fas fa-sign-in-alt"></i> ログイン
     </button>
-
-    <!-- マスタメンテナンスボタン（アイコン付き） -->
     <button class="button master-btn" onclick="goToMaster()">
       <i class="fas fa-cogs"></i> マスタメンテナンス
     </button>
-
-    <!-- ログアウトボタン（アイコン付き） -->
     <button class="button logout-btn" onclick="logout()">
       <i class="fas fa-sign-out-alt"></i> ログアウト
     </button>
@@ -131,37 +127,45 @@
 
       console.log("🔍 入力されたユーザーID:", userId);
 
-      let { data, error } = await db
-        .from("guild_members")
-        .select("id, role")
-        .eq("id", userId)
-        .single();
+      try {
+        let { data, error } = await db
+          .from("guild_members")
+          .select("id, role")
+          .eq("id", userId)
+          .single();
 
-      console.log("🛠️ Supabase からのレスポンス:", data, error);
+        console.log("🛠️ Supabase からのレスポンス:", data, error);
 
-      if (error || !data) {
-        alert("ユーザーが見つかりません");
-        return;
+        if (error || !data) {
+          console.error("❌ ユーザーが見つかりません:", error);
+          alert("ユーザーが見つかりません");
+          return;
+        }
+
+        // ✅ ユーザー情報を sessionStorage に保存
+        sessionStorage.setItem("loginId", data.id);
+        sessionStorage.setItem("loginRole", data.role);
+
+        // ✅ ローカルストレージにも保存（チェックが入っている場合）
+        if (rememberMe) {
+          localStorage.setItem("userId", userId);
+        } else {
+          localStorage.removeItem("userId");
+        }
+
+        alert(`ログイン成功: ${data.id} (${data.role})`);
+
+        console.log("✅ ページ遷移を実行: guild_battle_view.html");
+        
+        // ✅ ページ遷移（ログイン情報をURLに含める）
+        setTimeout(() => {
+          window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(data.id)}&role=${encodeURIComponent(data.role)}`;
+        }, 500);
+
+      } catch (err) {
+        console.error("❌ ログイン処理中にエラーが発生:", err);
+        alert("ログイン処理中に問題が発生しました");
       }
-
-      // ユーザー情報を sessionStorage に保存
-      sessionStorage.setItem("loginId", data.id);
-      sessionStorage.setItem("loginRole", data.role);
-
-      if (rememberMe) {
-        localStorage.setItem("userId", userId);
-      } else {
-        localStorage.removeItem("userId");
-      }
-
-      alert(`ログイン成功: ${data.id} (${data.role})`);
-
-      console.log("🔄 ページ遷移を実行: guild_battle_view.html");
-      
-      // ✅ ここでログイン情報を渡して guild_battle_view.html に遷移
-      setTimeout(() => {
-        window.location.href = `guild_battle_view.html?loginId=${encodeURIComponent(data.id)}&role=${encodeURIComponent(data.role)}`;
-      }, 500);
     }
 
     function goToMaster() {
