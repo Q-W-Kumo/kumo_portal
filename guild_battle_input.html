@@ -578,7 +578,16 @@ async function saveBattleData() {
     .join(",");
 
   const now = new Date();
-  const updatedAt = now.toISOString();
+  now.setHours(now.getHours() + 9);  // UTC → JST（日本時間は +9時間）
+
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mi = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+
+  const updatedAt = `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`; // JST形式に変換
 
   const battleData = {
     id: playerId,
