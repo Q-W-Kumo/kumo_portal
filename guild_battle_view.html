@@ -706,14 +706,16 @@ async function initializePage() {
 }
 
     // ✅ 更新ボタンの動作を修正（新規追加）
-    function goToBattleInputPage() {
+    function goToBattleInputPage(playerId) {
     const loginId = sessionStorage.getItem("loginId");
     const loginRole = sessionStorage.getItem("loginRole");
+    const currentRound = sessionStorage.getItem("currentRound");
 
     console.log("🟢 goToBattleInputPage() 呼び出し");
     console.log("🔍 取得した loginId:", loginId);
     console.log("🔍 取得した loginRole:", loginRole);
     console.log("🔍 取得した currentRound (関数内):", currentRound);
+    console.log("🔍 渡された playerId:", playerId); // ✅ ここを追加
 
 if (!loginId || !loginRole) {
         alert("ログイン情報が取得できません。再度ログインしてください。");
@@ -727,6 +729,11 @@ if (!loginId || !loginRole) {
         return;
     }
     
+    if (!playerId) {
+        alert("プレイヤーIDが取得できませんでした。");
+        return;
+    }
+
     // ✅ セッションストレージに明示的にセット
     sessionStorage.setItem("currentRound", currentRound);
     sessionStorage.setItem("loginId", loginId);
@@ -739,11 +746,10 @@ if (!loginId || !loginRole) {
         round: currentRound
     });
 
-    console.log("✅ 遷移先:", `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`);
-  
-    // ✅ guild_battle_input.html にログイン情報、開催中バトルのラウンド、プレイヤーIDを渡す
-window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}&id=${encodeURIComponent(playerId)}`;
+    console.log("✅ 遷移先:", `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}&id=${encodeURIComponent(playerId)}`);
 
+    // ✅ guild_battle_input.html にログイン情報、開催中バトルのラウンド、プレイヤーIDを渡す
+    window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}&id=${encodeURIComponent(playerId)}`;
 }
 
 　　// 🔹 6️⃣ ページロード時にデータを取得
@@ -863,9 +869,14 @@ if (member.id === loginId) {
   const btn = document.createElement('button');
   btn.className = 'update-button';
   btn.textContent = '更新';
-  btn.onclick = goToBattleInputPage;  // ✅ ここを修正
+
+  // ✅ `playerId` を明示的に渡すように修正
+  btn.onclick = () => goToBattleInputPage(member.id);
+  
   actionCell.appendChild(btn);
-} else {
+}  
+
+else {
   actionCell.innerHTML = '-';
 }
 row.appendChild(actionCell);
