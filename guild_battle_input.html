@@ -477,17 +477,16 @@ let loginRole = 'member';
 async function initializePage() {
   console.log("🟢 initializePage() 実行開始");
 
-  // ✅ セッションストレージからログイン情報を取得
-  let loginId = sessionStorage.getItem("loginId") || "未取得";
-  loginRole = sessionStorage.getItem("loginRole") || "member"; // 🔹 `let` を削除して変数更新
-  let currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
+  // ✅ セッションストレージからログイン情報を取得（let を削除し、変数上書き）
+  loginId = sessionStorage.getItem("loginId") || "未取得";
+  loginRole = sessionStorage.getItem("loginRole") || "member";  // ✅ ここは `let` を削除
+  currentRound = parseInt(sessionStorage.getItem("currentRound"), 10) || 0;
 
   console.log("🔍 sessionStorage から取得:");
   console.log("🔍 loginId:", loginId);
   console.log("🔍 loginRole:", loginRole);
   console.log("🔍 currentRound:", currentRound);
 
-  // 🔹 ログイン情報が取得できない場合、再ログインを要求
   if (!loginId || !loginRole) {
     alert("ログイン情報が取得できません。再度ログインしてください。");
     window.location.href = "guild_home.html";
@@ -539,8 +538,8 @@ async function initializePage() {
 
   console.log("✅ 取得したギルドメンバー:", guildMembers);
 
-  // 🔹 ログインユーザーの役割を更新（`let` を使わずに `loginRole` を上書き）
-  loginRole = guildMembers.find(m => m.id === loginId)?.role || "member";
+  // 🔹 ログインユーザーの役割を上書き（let を使わない）
+  loginRole = guildMembers.find(m => m.id === loginId)?.role || "member";  // ✅ ここで `let` を使わず上書き
   console.log("🔍 更新後の loginRole:", loginRole);
 
   // ✅ ギルドメンバー一覧をロード
@@ -552,7 +551,6 @@ async function initializePage() {
 }
 
 window.onload = initializePage;
-
 
 async function saveBattleData() {
   const playerId = document.getElementById("playerId").value;
