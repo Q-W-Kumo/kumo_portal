@@ -522,6 +522,24 @@
      }
      window.location.href = `${page}?loginId=${loginId}`;
    }
+
+function navigateToInputPage() {
+  const loginId = sessionStorage.getItem("loginId") || "";
+  const loginRole = sessionStorage.getItem("loginRole") || "member";
+  const currentRound = sessionStorage.getItem("currentRound") || 0;
+
+  // ✅ プレイヤー ID を取得（自分の ID を渡す）
+  const playerId = loginId;  // ログイン ID がそのままプレイヤー ID
+
+  if (!playerId) {
+    alert("プレイヤー情報がありません！");
+    return;
+  }
+
+  // ✅ URL に `id` を含めてデータ入力ページへ遷移
+  window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${currentRound}&id=${playerId}`;
+}
+
     // ✅ ここに完成ページのJSを挿入する
 
     let guildMembers = [];
