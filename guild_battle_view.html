@@ -523,7 +523,7 @@
      window.location.href = `${page}?loginId=${loginId}`;
    }
 
-function navigateToInputPage() {
+function navigateToInputPage(playerId) {
   const loginId = sessionStorage.getItem("loginId") || "";
   const loginRole = sessionStorage.getItem("loginRole") || "member";
   const currentRound = sessionStorage.getItem("currentRound") || 0;
@@ -739,8 +739,9 @@ if (!loginId || !loginRole) {
 
     console.log("✅ 遷移先:", `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`);
   
-    // ✅ guild_battle_input.html にログイン情報と開催中バトルのラウンドを渡す
-      window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}`;
+    // ✅ guild_battle_input.html にログイン情報、開催中バトルのラウンド、プレイヤーIDを渡す
+window.location.href = `guild_battle_input.html?loginId=${encodeURIComponent(loginId)}&role=${encodeURIComponent(loginRole)}&round=${encodeURIComponent(currentRound)}&id=${encodeURIComponent(playerId)}`;
+
 }
 
 　　// 🔹 6️⃣ ページロード時にデータを取得
