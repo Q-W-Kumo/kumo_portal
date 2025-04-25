@@ -726,33 +726,35 @@ async function initializePage() {
 }
 
     // ✅ 更新ボタンの動作を修正（新規追加）
-    function goToBattleInputPage(playerId) {
-    const loginId = sessionStorage.getItem("loginId");
-    const loginRole = sessionStorage.getItem("loginRole");
-    const currentRound = sessionStorage.getItem("currentRound");
+async function goToBattleInputPage(playerId) {
+  const loginId = sessionStorage.getItem("loginId");
+  const loginRole = sessionStorage.getItem("loginRole");
 
-    console.log("🟢 goToBattleInputPage() 呼び出し");
-    console.log("🔍 取得した loginId:", loginId);
-    console.log("🔍 取得した loginRole:", loginRole);
-    console.log("🔍 取得した currentRound (関数内):", currentRound);
-    console.log("🔍 渡された playerId:", playerId); // ✅ ここを追加
+  console.log("🟢 goToBattleInputPage() 呼び出し");
 
-if (!loginId || !loginRole) {
-        alert("ログイン情報が取得できません。再度ログインしてください。");
-    　  window.location.href = "index.html";
-        return;
-    }
+  if (!loginId || !loginRole) {
+    alert("ログイン情報が取得できません。再度ログインしてください。");
+    window.location.href = "index.html";
+    return;
+  }
 
-    if (!currentRound) {
-        alert("開催中のギルドバトルが設定されていません。");
-        console.error("⚠️ currentRound の値が無効:", currentRound);
-        return;
-    }
-    
-    if (!playerId) {
-        alert("プレイヤーIDが取得できませんでした。");
-        return;
-    }
+  // ✅ 最新のギルドバトル情報を取得して currentRound を再設定する
+  const latestBattle = await fetchOngoingBattle();
+  if (!latestBattle) {
+    alert("開催中のギルドバトルがありません。");
+    return;
+  }
+
+  const currentRound = parseInt(latestBattle.round.replace('第', '').replace('回', ''), 10) || 0;
+  sessionStorage.setItem("currentRound", currentRound);
+
+  console.log("🔍 更新後の currentRound:", currentRound);
+  console.log("🔍 渡された playerId:", playerId);
+
+  if (!playerId) {
+    alert("プレイヤーIDが取得できませんでした。");
+    return;
+  }
 
     // ✅ セッションストレージに明示的にセット
     sessionStorage.setItem("currentRound", currentRound);
