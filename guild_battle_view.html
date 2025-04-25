@@ -902,12 +902,12 @@ row.appendChild(updateTimeCell);
 
 const actionCell = document.createElement('td');
 if (member.id === loginId) {
-  const btn = document.createElement('button');
-  btn.className = 'update-button';
-  btn.textContent = '更新';
 
-  // ✅ `playerId` を明示的に渡すように修正
-  btn.onclick = () => goToBattleInputPage(member.id);
+const btn = document.createElement('button');
+btn.className = 'update-button';
+btn.textContent = '更新';
+
+btn.onclick = () => refreshPage(); // 🔥ここをrefreshPage()にする！
   
   actionCell.appendChild(btn);
 }  
