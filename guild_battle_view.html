@@ -837,11 +837,18 @@ async function toggleChallenge(memberId, day, slot) {
 
   await saveChallengeStatusToDB(memberId);
 
-  // 🔥ここ追加：最新のchallengeStatusをサーバから再取得する！
+  // 🔥 サーバから最新データ再取得
   challengeStatus = await fetchChallengeStatus();
 
+  // 🔥 ボタンだけ即座にクラス切り替え（ここが重要）
+  const btn = document.getElementById(`btn_${memberId}_${day}_${slot}`);
+  if (btn) {
+    btn.classList.toggle('active');
+  }
+
+  // 🔥 全体テーブルも再描画（いったん仕上げるため）
   renderTable(guildMembers);
-}    
+}
 
 async function saveChallengeStatusToDB(memberId) {
   if (!challengeStatus[memberId]) return;
@@ -865,18 +872,18 @@ async function saveChallengeStatusToDB(memberId) {
   }
 }
 
-   function renderChallengeButtons(memberId, day) {
-        const buttons = [];
-        const slots = challengeStatus[memberId]?.[`day${day}`] || {};
+function renderChallengeButtons(memberId, day) {
+    const buttons = [];
+    const slots = challengeStatus[memberId]?.[`day${day}`] || {};
 
-        for (let i = 1; i <= 3; i++) {
-            const slotKey = `slot${i}`;
-            const active = slots[slotKey] === true; // 🔹 JSON内のキーを明示的に指定
+    for (let i = 1; i <= 3; i++) {
+        const slotKey = `slot${i}`;
+        const active = slots[slotKey] === true;
 
-            buttons.push(`<button class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
-        }
-        return buttons.join('');
-    }    
+        buttons.push(`<button id="btn_${memberId}_${day}_${i}" class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
+    }
+    return buttons.join('');
+} 
     
 function renderTable(members = guildMembers) {
   // ✅ ロール順→戦力順で並び替え
