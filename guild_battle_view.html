@@ -636,25 +636,31 @@ async function fetchBattleRecords(round) {
 
 // 🔹 4️⃣ 挑戦状況を取得
 async function fetchChallengeStatus() {
-    const { data, error } = await db
-        .from('challenge_status')
-        .select('*');
+  if (!currentRound) {
+    console.error("❌ currentRound が未取得です！");
+    return {};
+  }
 
-    if (error) {
-        console.error('挑戦状況取得エラー:', error);
-        return {};
-    }
+  const { data, error } = await db
+    .from('challenge_status')
+    .select('*')
+    .eq('round', currentRound); // ここでroundを指定！！
 
-    let status = {};
-    data.forEach(row => {
-        status[row.member_id] = {
-            day1: row.day1 || [],
-            day2: row.day2 || [],
-            day3: row.day3 || []
-        };
-    });
+  if (error) {
+    console.error('挑戦状況取得エラー:', error);
+    return {};
+  }
 
-    return status;
+  let status = {};
+  data.forEach(row => {
+    status[row.member_id] = {
+      day1: row.day1 || {},
+      day2: row.day2 || {},
+      day3: row.day3 || {}
+    };
+  });
+
+  return status;
 }
 
 let ongoingBattle = null;  // ✅ グローバル変数として定義
@@ -858,11 +864,12 @@ async function saveChallengeStatusToDB(memberId) {
     day1: challengeStatus[memberId].day1 || {},
     day2: challengeStatus[memberId].day2 || {},
     day3: challengeStatus[memberId].day3 || {},
+    round: currentRound   // ここ追加！！
   };
 
   const { data, error } = await db
     .from('challenge_status')
-    .upsert([dataToSave], { onConflict: ['member_id'] });
+    .upsert([dataToSave], { onConflict: ['member_id', 'round'] }); // roundもonConflictに入れる
 
   if (error) {
     console.error("❌ 挑戦状況の保存に失敗:", error);
