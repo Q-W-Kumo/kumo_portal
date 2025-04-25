@@ -820,15 +820,42 @@ async function goToBattleInputPage(playerId) {
       closeModal();
     }
 
-    function toggleChallenge(memberId, day, slot) {
-      if (!challengeStatus[memberId]) challengeStatus[memberId] = {};
-      if (!challengeStatus[memberId][`day${day}`]) challengeStatus[memberId][`day${day}`] = {};
-      challengeStatus[memberId][`day${day}`][slot] = !challengeStatus[memberId][`day${day}`][slot];
-      localStorage.setItem('challengeStatus', JSON.stringify(challengeStatus));
-      renderTable(guildMembers);
-    }
+function toggleChallenge(memberId, day, slot) {
+  if (!challengeStatus[memberId]) challengeStatus[memberId] = {};
+  if (!challengeStatus[memberId][`day${day}`]) challengeStatus[memberId][`day${day}`] = {};
 
-    function renderChallengeButtons(memberId, day) {
+  // 状態をトグル（切り替え）
+  challengeStatus[memberId][`day${day}`][slot] = !challengeStatus[memberId][`day${day}`][slot];
+
+  // ✅ Supabaseに保存だけする（ローカル保存しない）
+  saveChallengeStatusToDB(memberId);
+
+  renderTable(guildMembers);
+}
+ 
+async function saveChallengeStatusToDB(memberId) {
+  if (!challengeStatus[memberId]) return;
+
+  const dataToSave = {
+    member_id: memberId,
+    day1: challengeStatus[memberId].day1 || {},
+    day2: challengeStatus[memberId].day2 || {},
+    day3: challengeStatus[memberId].day3 || {},
+  };
+
+  const { data, error } = await db
+    .from('challenge_status')
+    .upsert([dataToSave], { onConflict: ['member_id'] });
+
+  if (error) {
+    console.error("❌ 挑戦状況の保存に失敗:", error);
+    alert("挑戦状況の保存に失敗しました！");
+  } else {
+    console.log("✅ 挑戦状況を保存しました:", data);
+  }
+}
+
+   function renderChallengeButtons(memberId, day) {
         const buttons = [];
         const slots = challengeStatus[memberId]?.[`day${day}`] || {};
 
