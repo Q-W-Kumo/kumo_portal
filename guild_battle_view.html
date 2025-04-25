@@ -839,20 +839,13 @@ async function toggleChallenge(memberId, day, slot) {
   if (!challengeStatus[memberId]) challengeStatus[memberId] = {};
   if (!challengeStatus[memberId][`day${day}`]) challengeStatus[memberId][`day${day}`] = {};
 
+  // 状態をトグル（切り替え）
   challengeStatus[memberId][`day${day}`][slot] = !challengeStatus[memberId][`day${day}`][slot];
 
+  // ✅ Supabaseに保存が終わるのを待ってから
   await saveChallengeStatusToDB(memberId);
 
-  // 🔥 サーバから最新データ再取得
-  challengeStatus = await fetchChallengeStatus();
-
-  // 🔥 ボタンだけ即座にクラス切り替え（ここが重要）
-  const btn = document.getElementById(`btn_${memberId}_${day}_${slot}`);
-  if (btn) {
-    btn.classList.toggle('active');
-  }
-
-  // 🔥 全体テーブルも再描画（いったん仕上げるため）
+  // ✅ そのあと描画する
   renderTable(guildMembers);
 }
 
