@@ -829,19 +829,17 @@ async function goToBattleInputPage(playerId) {
       closeModal();
     }
 
-function toggleChallenge(memberId, day, slot) {
+async function toggleChallenge(memberId, day, slot) {
   if (!challengeStatus[memberId]) challengeStatus[memberId] = {};
   if (!challengeStatus[memberId][`day${day}`]) challengeStatus[memberId][`day${day}`] = {};
 
-  // 状態をトグル（切り替え）
   challengeStatus[memberId][`day${day}`][slot] = !challengeStatus[memberId][`day${day}`][slot];
 
-  // ✅ Supabaseに保存だけする（ローカル保存しない）
-  saveChallengeStatusToDB(memberId);
+  await saveChallengeStatusToDB(memberId);  // ← await をつける！
 
-  renderTable(guildMembers);
-}
- 
+  renderTable(guildMembers);  // 保存が終わってからテーブル更新！
+} 
+    
 async function saveChallengeStatusToDB(memberId) {
   if (!challengeStatus[memberId]) return;
 
