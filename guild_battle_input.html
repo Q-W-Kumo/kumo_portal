@@ -591,19 +591,22 @@ async function saveBattleData() {
     .map((el) => el.value)
     .join(",");
 
-  const now = new Date();
-  now.setHours(now.getHours() + 9);  // UTC → JST（日本時間は +9時間）
+// 正しいJSTでの現在時刻を生成（UTC → JST補正）
+const now = new Date();
 
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const hh = String(now.getHours()).padStart(2, '0');
-  const mi = String(now.getMinutes()).padStart(2, '0');
-  const ss = String(now.getSeconds()).padStart(2, '0');
+// Intlで日本時間に変換した文字列を使う（ISO8601風にもなる）
+const jstDate = new Date(now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }));
 
-  const updatedAt = `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`; // JST形式に変換
+const yyyy = jstDate.getFullYear();
+const mm = String(jstDate.getMonth() + 1).padStart(2, '0');
+const dd = String(jstDate.getDate()).padStart(2, '0');
+const hh = String(jstDate.getHours()).padStart(2, '0');
+const mi = String(jstDate.getMinutes()).padStart(2, '0');
+const ss = String(jstDate.getSeconds()).padStart(2, '0');
 
-  const battleData = {
+const updatedAt = `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+  
+const battleData = {
     id: playerId,
     round: currentRound,
     ...stageValues,
