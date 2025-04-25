@@ -398,6 +398,20 @@ async function loadGuildMembersTable() {
   }
 
   const members = await fetchGuildMembers();
+
+ // ✅ ここで並び順を整える
+  members.sort((a, b) => {
+    const roleOrder = { GM: 0, SM: 1, member: 2, DFN: 3 };
+    const roleA = roleOrder[a.role] ?? 4;
+    const roleB = roleOrder[b.role] ?? 4;
+
+    if (roleA !== roleB) {
+      return roleA - roleB;
+    }
+
+    return (b.power || 0) - (a.power || 0);
+  });  
+  
   const tableBody = document.getElementById("memberTableBody");
   tableBody.innerHTML = "";
 
