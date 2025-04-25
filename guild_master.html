@@ -581,15 +581,20 @@ async function renderMembers() {
     return;
   }
 
-  // ✅ ソート処理（役割 → 戦力順）
-  members.sort((a, b) => {
-    const roleOrder = { 'GM': 1, 'SM': 2, '一般': 3, 'DFN': 4 };
-    if (roleOrder[a.role] !== roleOrder[b.role]) {
-      return roleOrder[a.role] - roleOrder[b.role];
-    }
-    return b.power - a.power;
-  });
+// ✅ 正しいソート処理（GM → SM → member → DFN）＆戦力順
+members.sort((a, b) => {
+  const roleOrder = { GM: 0, SM: 1, member: 2, DFN: 3 }; // ←注意！「member」表記！
+  const roleA = roleOrder[a.role] ?? 4;
+  const roleB = roleOrder[b.role] ?? 4;
 
+  if (roleA !== roleB) {
+    return roleA - roleB; // ロール順でまず並べる
+  }
+
+  // 同じロールなら戦力順（降順）
+  return (b.power || 0) - (a.power || 0);
+});
+  
   // ✅ 画面に反映
   const tbody = document.getElementById('memberTableBody');
   tbody.innerHTML = '';
