@@ -841,10 +841,25 @@ async function goToBattleInputPage(playerId) {
         return buttons.join('');
     }    
     
-    function renderTable(members = guildMembers) {
-      tableBody.innerHTML = '';
-      members.forEach(member => {
-        const row = document.createElement('tr');
+function renderTable(members = guildMembers) {
+  // ✅ ロール順→戦力順で並び替え
+  members.sort((a, b) => {
+    const roleOrder = { GM: 0, SM: 1, member: 2, DFN: 3 };
+    const roleA = roleOrder[a.role] ?? 4;
+    const roleB = roleOrder[b.role] ?? 4;
+
+    if (roleA !== roleB) {
+      return roleA - roleB;
+    }
+
+    return (b.power || 0) - (a.power || 0);
+  });
+
+  tableBody.innerHTML = '';
+
+  members.forEach(member => { 
+    
+    const row = document.createElement('tr');
         const record = battleRecords.find(r => r.id === member.id && ongoingBattle && r.round === Number(ongoingBattle.round.replace('第', '').replace('回', '')));
 
         const playerCell = document.createElement('td');
