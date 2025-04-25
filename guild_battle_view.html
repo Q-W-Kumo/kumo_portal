@@ -873,16 +873,16 @@ async function saveChallengeStatusToDB(memberId) {
 }
 
 function renderChallengeButtons(memberId, day) {
-    const buttons = [];
-    const slots = challengeStatus[memberId]?.[`day${day}`] || {};
+  const buttons = [];
+  const slots = challengeStatus[memberId]?.[`day${day}`] || {};
 
-    for (let i = 1; i <= 3; i++) {
-        const slotKey = `slot${i}`;
-        const active = slots[slotKey] === true;
+  for (let i = 1; i <= 3; i++) {
+    const slotKey = `slot${i}`;
+    const active = slots[slotKey] == true; // <= ここを「==」にする！！
 
-        buttons.push(`<button id="btn_${memberId}_${day}_${i}" class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
-    }
-    return buttons.join('');
+    buttons.push(`<button class="challenge-btn ${active ? 'active' : ''}" onclick="toggleChallenge('${memberId}', ${day}, ${i})">${i}</button>`);
+  }
+  return buttons.join('');
 } 
     
 function renderTable(members = guildMembers) {
