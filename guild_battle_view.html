@@ -835,11 +835,14 @@ async function toggleChallenge(memberId, day, slot) {
 
   challengeStatus[memberId][`day${day}`][slot] = !challengeStatus[memberId][`day${day}`][slot];
 
-  await saveChallengeStatusToDB(memberId);  // ← await をつける！
+  await saveChallengeStatusToDB(memberId);
 
-  renderTable(guildMembers);  // 保存が終わってからテーブル更新！
-} 
-    
+  // 🔥ここ追加：最新のchallengeStatusをサーバから再取得する！
+  challengeStatus = await fetchChallengeStatus();
+
+  renderTable(guildMembers);
+}    
+
 async function saveChallengeStatusToDB(memberId) {
   if (!challengeStatus[memberId]) return;
 
